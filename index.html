@@ -3,204 +3,276 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>LeaveEasy — Leave Management</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>LeaveEasy</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0f1117;
-    --surface: #1a1d27;
-    --surface2: #22263a;
-    --accent: #4ade80;
-    --accent2: #22d3ee;
-    --warn: #fb923c;
-    --danger: #f87171;
-    --text: #f1f5f9;
-    --muted: #64748b;
-    --border: #2e3347;
-    --radius: 16px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 15px;
-  }
-  .nav {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 20px; background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    position: sticky; top: 0; z-index: 100;
-  }
-  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--accent); letter-spacing: -0.5px; }
-  .nav-logo span { color: var(--text); }
-  .nav-tabs { display: flex; gap: 6px; }
-  .nav-tab {
-    padding: 7px 14px; border-radius: 30px; border: none; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
-    background: transparent; color: var(--muted); transition: all 0.2s;
-  }
-  .nav-tab.active { background: var(--accent); color: #0f1117; }
+:root {
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--surface3:#2a2e42;
+  --accent:#4ade80;--accent2:#22d3ee;--warn:#fb923c;--danger:#f87171;--purple:#a78bfa;
+  --text:#f1f5f9;--muted:#64748b;--border:#2e3347;--radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;}
 
-  .page { display: none; padding: 24px 20px 100px; max-width: 520px; margin: 0 auto; }
-  .page.active { display: block; }
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 14px;height:56px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--accent);white-space:nowrap;}
+.nav-logo span{color:var(--text);}
+.nav-tabs{display:flex;gap:2px;overflow-x:auto;padding-left:8px;}
+.nav-tabs::-webkit-scrollbar{display:none;}
+.nav-tab{padding:6px 11px;border-radius:20px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;background:transparent;color:var(--muted);transition:all 0.2s;white-space:nowrap;}
+.nav-tab.active{background:var(--accent);color:#0f1117;}
 
-  h1 { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; }
-  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 28px; line-height: 1.5; }
+/* PAGES */
+.page{display:none;padding:20px 16px 100px;max-width:560px;margin:0 auto;animation:fadeUp 0.2s ease;}
+.page.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
-  .form-group { margin-bottom: 18px; }
-  label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-  input, select, textarea {
-    width: 100%; padding: 14px 16px; background: var(--surface2);
-    border: 1.5px solid var(--border); border-radius: var(--radius);
-    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px;
-    outline: none; transition: border-color 0.2s; -webkit-appearance: none;
-  }
-  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
-  textarea { resize: vertical; min-height: 90px; }
-  select option { background: var(--surface2); }
-  .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+h1{font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:800;margin-bottom:4px;}
+.subtitle{color:var(--muted);font-size:13px;margin-bottom:20px;line-height:1.5;}
 
-  .leave-types { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
-  .leave-card {
-    padding: 14px 12px; border-radius: var(--radius); border: 2px solid var(--border);
-    cursor: pointer; text-align: center; transition: all 0.2s; background: var(--surface2);
-  }
-  .leave-card:hover { border-color: var(--accent); }
-  .leave-card.selected { border-color: var(--accent); background: rgba(74,222,128,0.08); }
-  .leave-card .icon { font-size: 22px; margin-bottom: 6px; }
-  .leave-card .lbl { font-size: 12px; font-weight: 600; }
-  .leave-card .desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+/* FORMS */
+.form-group{margin-bottom:15px;}
+label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;}
+input,select,textarea{width:100%;padding:12px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+textarea{resize:vertical;min-height:82px;}
+select option{background:var(--surface2);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 
-  .hours-row { display: none; }
-  .hours-row.visible { display: block; }
+/* LEAVE TYPES */
+.leave-types{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.leave-card{padding:12px 10px;border-radius:12px;border:2px solid var(--border);cursor:pointer;text-align:center;transition:all 0.2s;background:var(--surface2);}
+.leave-card:hover{border-color:var(--accent);}
+.leave-card.selected{border-color:var(--accent);background:rgba(74,222,128,0.08);}
+.leave-card .icon{font-size:20px;margin-bottom:4px;}
+.leave-card .lbl{font-size:12px;font-weight:700;}
+.leave-card .desc{font-size:10px;color:var(--muted);margin-top:1px;}
+.hours-row{display:none;}
+.hours-row.visible{display:block;}
 
-  .btn-submit {
-    width: 100%; padding: 16px; background: var(--accent);
-    color: #0f1117; font-family: 'Syne', sans-serif; font-weight: 700;
-    font-size: 16px; border: none; border-radius: var(--radius);
-    cursor: pointer; transition: all 0.2s; margin-top: 8px;
-  }
-  .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(74,222,128,0.25); }
+/* BALANCE */
+.balance-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:15px;margin-bottom:16px;}
+.balance-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;}
+.balance-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.balance-label{font-size:13px;font-weight:600;}
+.balance-days{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;}
+.bal-bar{height:5px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:12px;}
+.bal-fill{height:100%;border-radius:99px;transition:width 0.5s ease;}
 
-  .success-box {
-    background: rgba(74,222,128,0.1); border: 1.5px solid var(--accent);
-    border-radius: var(--radius); padding: 20px; text-align: center;
-    display: none; margin-bottom: 24px;
-  }
-  .success-box.visible { display: block; }
-  .success-icon { font-size: 36px; margin-bottom: 8px; }
-  .success-box h3 { font-family: 'Syne', sans-serif; color: var(--accent); margin-bottom: 6px; }
-  .success-box p { font-size: 13px; color: var(--muted); }
-  .btn-new { display:inline-block; margin-top:14px; padding: 10px 20px; background: var(--surface2); color: var(--text); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size:13px; cursor:pointer; }
+/* BUTTONS */
+.btn-submit{width:100%;padding:14px;background:var(--accent);color:#0f1117;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;border:none;border-radius:var(--radius);cursor:pointer;transition:all 0.2s;margin-top:6px;}
+.btn-submit:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(74,222,128,0.25);}
+.btn-submit:active{transform:scale(0.98);}
 
-  .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 24px; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 12px; text-align: center; }
-  .stat-num { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; }
-  .stat-num.green { color: var(--accent); }
-  .stat-num.orange { color: var(--warn); }
-  .stat-num.blue { color: var(--accent2); }
-  .stat-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+/* SUCCESS */
+.success-box{background:rgba(74,222,128,0.08);border:1.5px solid var(--accent);border-radius:var(--radius);padding:20px 16px;text-align:center;display:none;margin-bottom:18px;}
+.success-box.visible{display:block;}
+.success-icon{font-size:36px;margin-bottom:8px;}
+.success-box h3{font-family:'Syne',sans-serif;color:var(--accent);margin-bottom:5px;}
+.success-box p{font-size:13px;color:var(--muted);}
+.btn-new{display:inline-block;margin-top:12px;padding:9px 18px;background:var(--surface2);color:var(--text);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
 
-  .filter-tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
-  .filter-tab {
-    padding: 7px 14px; border-radius: 30px; border: 1.5px solid var(--border);
-    background: transparent; color: var(--muted); font-size: 12px; font-weight: 500;
-    cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
-  }
-  .filter-tab.active { background: var(--surface2); border-color: var(--accent2); color: var(--accent2); }
+/* PIN OVERLAY */
+.pin-overlay{position:fixed;inset:0;background:rgba(15,17,23,0.95);display:none;align-items:center;justify-content:center;z-index:999;padding:24px;backdrop-filter:blur(4px);}
+.pin-overlay.show{display:flex;}
+.pin-box{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:30px 22px;max-width:320px;width:100%;text-align:center;}
+.pin-box h2{font-family:'Syne',sans-serif;font-size:1.15rem;margin-bottom:6px;}
+.pin-box p{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.pin-input{display:flex;gap:10px;justify-content:center;margin-bottom:16px;}
+.pin-input input{width:50px;height:56px;text-align:center;font-size:22px;font-weight:700;border-radius:12px;padding:0;}
+.pin-error{color:var(--danger);font-size:13px;margin-bottom:10px;display:none;}
+.btn-pin{width:100%;padding:12px;background:var(--accent);color:#0f1117;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;border:none;border-radius:12px;cursor:pointer;}
+.pin-hint{font-size:11px;color:var(--muted);margin-top:10px;}
 
-  .request-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
-  }
-  .req-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-  .req-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
-  .req-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
-  .badge.pending { background: rgba(251,146,60,0.15); color: var(--warn); }
-  .badge.approved { background: rgba(74,222,128,0.12); color: var(--accent); }
-  .badge.rejected { background: rgba(248,113,113,0.12); color: var(--danger); }
+/* ADMIN SELECT on PIN screen */
+.admin-select-list{margin:0 0 16px;text-align:left;}
+.admin-select-item{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface2);margin-bottom:8px;cursor:pointer;transition:all 0.18s;}
+.admin-select-item:hover{border-color:var(--accent);}
+.admin-select-item.selected{border-color:var(--accent);background:rgba(74,222,128,0.08);}
+.admin-select-item .asi-name{font-weight:700;font-size:14px;}
+.admin-select-item .asi-role{font-size:11px;color:var(--muted);}
 
-  .req-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-  .meta-chip { padding: 4px 10px; border-radius: 8px; font-size: 12px; background: var(--surface2); color: var(--muted); }
-  .meta-chip strong { color: var(--text); }
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px 10px;text-align:center;}
+.stat-num{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:800;line-height:1;}
+.stat-num.green{color:var(--accent);}.stat-num.orange{color:var(--warn);}.stat-num.blue{color:var(--accent2);}
+.stat-label{font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.4px;}
 
-  .req-reason { font-size: 13px; color: var(--muted); margin-bottom: 10px; line-height: 1.4; }
-  .req-handover { font-size: 12px; color: var(--muted); background: var(--surface2); border-radius: 8px; padding: 8px 10px; margin-bottom: 12px; }
-  .req-handover span { color: var(--accent2); font-weight: 500; }
+/* FILTER TABS */
+.filter-tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;}
+.filter-tabs::-webkit-scrollbar{display:none;}
+.filter-tab{padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+.filter-tab.active{background:var(--surface2);border-color:var(--accent2);color:var(--accent2);}
 
-  .req-actions { display: flex; gap: 8px; }
-  .btn-approve, .btn-reject, .btn-wa {
-    flex: 1; padding: 10px; border-radius: 10px; border: none;
-    font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 13px;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .btn-approve { background: rgba(74,222,128,0.15); color: var(--accent); }
-  .btn-approve:hover { background: var(--accent); color: #0f1117; }
-  .btn-reject { background: rgba(248,113,113,0.1); color: var(--danger); }
-  .btn-reject:hover { background: var(--danger); color: #fff; }
-  .btn-wa { background: rgba(37,211,102,0.12); color: #25d366; flex: 0 0 auto; padding: 10px 14px; }
+/* REQUEST CARDS */
+.request-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;}
+.req-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;}
+.req-name{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;}
+.req-dept{font-size:11px;color:var(--accent2);margin-top:1px;font-weight:600;}
+.req-date{font-size:11px;color:var(--muted);margin-top:2px;}
+.badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+.badge.pending{background:rgba(251,146,60,0.15);color:var(--warn);}
+.badge.approved{background:rgba(74,222,128,0.12);color:var(--accent);}
+.badge.rejected{background:rgba(248,113,113,0.12);color:var(--danger);}
+.req-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.meta-chip{padding:3px 9px;border-radius:7px;font-size:11px;background:var(--surface2);color:var(--muted);}
+.meta-chip strong{color:var(--text);}
+.req-reason{font-size:13px;color:var(--muted);margin-bottom:7px;line-height:1.4;}
+.req-handover{font-size:12px;color:var(--muted);background:var(--surface2);border-radius:8px;padding:7px 10px;margin-bottom:10px;border-left:2px solid var(--accent2);}
+.req-handover span{color:var(--accent2);font-weight:600;}
+.req-actions{display:flex;gap:7px;}
+.btn-approve,.btn-reject,.btn-wa{flex:1;padding:9px 7px;border-radius:9px;border:none;font-family:'DM Sans',sans-serif;font-weight:600;font-size:12px;cursor:pointer;transition:all 0.18s;}
+.btn-approve{background:rgba(74,222,128,0.12);color:var(--accent);}
+.btn-approve:hover{background:var(--accent);color:#0f1117;}
+.btn-reject{background:rgba(248,113,113,0.1);color:var(--danger);}
+.btn-reject:hover{background:var(--danger);color:#fff;}
+.btn-wa{background:rgba(37,211,102,0.1);color:#25d366;flex:0 0 auto;padding:9px 12px;}
+.no-requests{text-align:center;padding:40px 20px;color:var(--muted);}
+.no-requests .big{font-size:36px;margin-bottom:10px;}
 
-  .no-requests { text-align: center; padding: 40px 20px; color: var(--muted); }
-  .no-requests .big { font-size: 36px; margin-bottom: 10px; }
+/* ── CALENDAR – full expanded view ── */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.cal-nav h2{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;}
+.cal-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+.cal-grid{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;}
+.cal-header-row{display:grid;grid-template-columns:repeat(7,1fr);}
+.cal-header-row div{padding:9px 3px;text-align:center;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border);}
+.cal-body{display:grid;grid-template-columns:repeat(7,1fr);}
+.cal-day{min-height:78px;padding:5px 4px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);overflow:hidden;}
+.cal-day:nth-child(7n){border-right:none;}
+.cal-day.other-month{opacity:0.3;}
+.cal-day.today .day-num{background:var(--accent);color:#0f1117;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-weight:800;margin:0 auto 3px;}
+.day-num{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:3px;text-align:center;}
+.leave-pill{font-size:8.5px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:3px;padding:1px 4px;margin-bottom:2px;display:block;}
+.pill-approved{background:rgba(74,222,128,0.22);color:#4ade80;}
+.pill-pending{background:rgba(251,146,60,0.22);color:#fb923c;}
+.pill-rejected{background:rgba(248,113,113,0.18);color:#f87171;}
+.cal-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+.leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
 
-  .report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 10px; }
-  .btn-export { padding: 10px 18px; background: var(--accent2); color: #0f1117; border: none; border-radius: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
-  .report-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .report-table th { background: var(--surface2); color: var(--muted); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; padding: 10px 8px; text-align: left; }
-  .report-table td { padding: 10px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  .report-table tr:last-child td { border-bottom: none; }
-  .report-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; overflow-x: auto; }
+/* DAY DETAIL PANEL */
+.day-detail-panel{background:var(--surface);border:1px solid var(--accent);border-radius:var(--radius);padding:14px;margin-bottom:14px;display:none;}
+.day-detail-panel.show{display:block;}
+.ddp-title{font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:var(--accent);margin-bottom:10px;}
+.ddp-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+.ddp-row:last-child{border-bottom:none;}
+.ddp-name{font-weight:700;font-size:13px;}
+.ddp-sub{font-size:11px;color:var(--muted);margin-top:1px;}
 
-  .pin-overlay {
-    position: fixed; inset: 0; background: var(--bg);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 999; padding: 24px;
-  }
-  .pin-box { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 32px 24px; max-width: 340px; width: 100%; text-align: center; }
-  .pin-box h2 { font-family: 'Syne', sans-serif; font-size: 1.3rem; margin-bottom: 8px; }
-  .pin-box p { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
-  .pin-input { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
-  .pin-input input { width: 50px; height: 56px; text-align: center; font-size: 22px; font-weight: 700; border-radius: 12px; }
-  .pin-error { color: var(--danger); font-size: 13px; margin-top: -10px; margin-bottom: 12px; display: none; }
-  .btn-pin { width: 100%; padding: 14px; background: var(--accent); color: #0f1117; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; border: none; border-radius: var(--radius); cursor: pointer; }
+/* HISTORY */
+.emp-search-wrap{position:relative;margin-bottom:12px;}
+.emp-list-drop{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface2);border:1.5px solid var(--accent);border-radius:12px;z-index:50;max-height:200px;overflow-y:auto;display:none;}
+.emp-list-drop.show{display:block;}
+.emp-option{padding:10px 13px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);}
+.emp-option:last-child{border-bottom:none;}
+.emp-option:hover{background:var(--surface3);}
+.emp-option .opt-dept{font-size:11px;color:var(--muted);}
+.history-header{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:15px;margin-bottom:13px;display:none;}
+.history-header.show{display:block;}
+.hist-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;}
+.hist-dept{font-size:12px;color:var(--accent2);margin-top:2px;}
+.hist-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.hist-stat{background:var(--surface2);border-radius:10px;padding:10px 8px;text-align:center;}
+.hist-stat-num{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;}
+.hist-stat-lbl{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;}
 
-  .toast {
-    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--surface2); border: 1px solid var(--border); border-radius: 30px;
-    padding: 10px 20px; font-size: 13px; z-index: 9999; opacity: 0;
-    transition: all 0.3s; white-space: nowrap;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* REPORT */
+.report-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+.report-btns{display:flex;gap:7px;flex-shrink:0;}
+.btn-export{padding:9px 14px;background:var(--accent2);color:#0f1117;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;}
+.week-selector{display:flex;align-items:center;gap:10px;background:var(--surface2);border-radius:12px;padding:8px 13px;margin-bottom:16px;}
+.week-selector select{background:transparent;border:none;color:var(--text);font-size:13px;font-weight:500;flex:1;}
+.week-label{font-size:12px;color:var(--muted);white-space:nowrap;}
+.report-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;overflow-x:auto;}
+.report-table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px;}
+.report-table th{background:var(--surface2);color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:0.5px;padding:10px;text-align:left;border-bottom:1px solid var(--border);}
+.report-table td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.report-table tr:last-child td{border-bottom:none;}
+.report-table tr:hover td{background:var(--surface2);}
 
-  .week-selector { display: flex; align-items: center; gap: 10px; background: var(--surface2); border-radius: 12px; padding: 8px 14px; margin-bottom: 20px; }
-  .week-selector select { background: transparent; border: none; color: var(--text); font-size: 13px; font-weight: 500; flex: 1; }
-  .week-label { font-size: 12px; color: var(--muted); }
+/* SETTINGS */
+.settings-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:13px;}
+.settings-section h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:13px;color:var(--accent);}
+.btn-save{padding:10px 20px;background:var(--accent);color:#0f1117;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;margin-top:8px;}
+.btn-danger{padding:10px 20px;background:rgba(248,113,113,0.1);color:var(--danger);border:1px solid rgba(248,113,113,0.2);border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;margin-top:8px;}
 
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+/* DEPT TAGS */
+.dept-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.dept-tag{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;}
+.dept-tag .remove-dept{background:rgba(248,113,113,0.15);border:none;color:var(--danger);width:18px;height:18px;border-radius:4px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;}
+.add-dept-row{display:flex;gap:8px;}
+.add-dept-row input{flex:1;}
+.btn-add{padding:0 16px;background:var(--accent);color:#0f1117;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;}
+
+/* ADMINS LIST */
+.admin-list{margin-bottom:12px;}
+.admin-item{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;}
+.admin-item-info .admin-item-name{font-weight:700;font-size:14px;}
+.admin-item-info .admin-item-role{font-size:11px;color:var(--accent2);margin-top:2px;}
+.admin-item-info .admin-item-pin{font-size:11px;color:var(--muted);margin-top:1px;}
+.btn-remove-admin{background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.2);color:var(--danger);padding:7px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.add-admin-form{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px;}
+.add-admin-form h4{font-family:'Syne',sans-serif;font-size:12px;color:var(--accent2);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;}
+
+/* LEAVE PERIOD BANNER */
+.period-banner{border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13px;display:flex;align-items:center;gap:10px;}
+.period-banner.active{background:rgba(74,222,128,0.1);border:1.5px solid var(--accent);}
+.period-banner.inactive{background:rgba(248,113,113,0.08);border:1.5px solid var(--danger);}
+.period-banner.noperiod{background:var(--surface);border:1px solid var(--border);}
+.period-icon{font-size:20px;flex-shrink:0;}
+.period-label{font-weight:700;font-size:13px;}
+.period-dates{font-size:11px;color:var(--muted);margin-top:2px;}
+/* TOGGLE SWITCH */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0 4px;}
+.toggle-switch{width:46px;height:26px;background:var(--border);border-radius:99px;cursor:pointer;position:relative;transition:background 0.25s;flex-shrink:0;}
+.toggle-switch.on{background:var(--accent);}
+.toggle-knob{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.35);}
+.toggle-switch.on .toggle-knob{transform:translateX(20px);}
+/* TIME WINDOW PREVIEW */
+.period-preview{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;}
+/* CLOSED OVERLAY on apply page */
+.closed-overlay{background:var(--surface);border:1.5px solid var(--danger);border-radius:var(--radius);padding:32px 20px;text-align:center;margin-top:14px;}
+/* APPROVED BY chip */
+.approved-by{font-size:11px;color:var(--accent);background:rgba(74,222,128,0.1);border-radius:6px;padding:3px 8px;margin-top:4px;display:inline-block;}
+.rejected-by{font-size:11px;color:var(--danger);background:rgba(248,113,113,0.1);border-radius:6px;padding:3px 8px;margin-top:4px;display:inline-block;}
+/* CLOSED OVERLAY on apply page */
+.closed-overlay{background:var(--surface);border:1.5px solid var(--danger);border-radius:var(--radius);padding:32px 20px;text-align:center;margin-top:14px;}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--surface2);border:1px solid var(--border);border-radius:30px;padding:10px 18px;font-size:13px;z-index:9999;opacity:0;transition:all 0.28s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
 </style>
 </head>
 <body>
 
-<!-- ADMIN PIN OVERLAY -->
-<div class="pin-overlay" id="pinOverlay" style="display:none;">
+<!-- PIN OVERLAY -->
+<div class="pin-overlay" id="pinOverlay">
   <div class="pin-box">
-    <div style="font-size:36px;margin-bottom:12px;">🔐</div>
+    <div style="font-size:32px;margin-bottom:10px">🔐</div>
     <h2>Admin Access</h2>
-    <p>Enter your 4-digit admin PIN to continue</p>
-    <div class="pin-input">
-      <input type="password" maxlength="1" id="p1" inputmode="numeric">
-      <input type="password" maxlength="1" id="p2" inputmode="numeric">
-      <input type="password" maxlength="1" id="p3" inputmode="numeric">
-      <input type="password" maxlength="1" id="p4" inputmode="numeric">
+    <p id="pinPromptText">Select an admin account</p>
+
+    <!-- Step 1: pick admin -->
+    <div class="admin-select-list" id="adminSelectList"></div>
+
+    <!-- Step 2: enter PIN -->
+    <div id="pinStep" style="display:none">
+      <div style="font-size:12px;color:var(--accent2);margin-bottom:14px;font-weight:600" id="selectedAdminLabel"></div>
+      <div class="pin-input">
+        <input type="password" maxlength="1" id="p1" inputmode="numeric">
+        <input type="password" maxlength="1" id="p2" inputmode="numeric">
+        <input type="password" maxlength="1" id="p3" inputmode="numeric">
+        <input type="password" maxlength="1" id="p4" inputmode="numeric">
+      </div>
+      <p class="pin-error" id="pinError">❌ Incorrect PIN. Try again.</p>
+      <button class="btn-pin" onclick="checkPin()">Unlock →</button>
+      <div style="margin-top:10px"><button onclick="backToAdminSelect()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">← Back</button></div>
     </div>
-    <p class="pin-error" id="pinError">❌ Incorrect PIN. Try again.</p>
-    <button class="btn-pin" onclick="checkPin()">Unlock</button>
-    <p style="font-size:11px;color:var(--muted);margin-top:14px;">Default PIN: <strong>1234</strong></p>
   </div>
 </div>
 
@@ -209,392 +281,843 @@
   <div class="nav-logo">Leave<span>Easy</span></div>
   <div class="nav-tabs">
     <button class="nav-tab active" id="tab-apply" onclick="showPage('apply')">Apply</button>
-    <button class="nav-tab" id="tab-admin" onclick="showPage('admin', true)">Admin</button>
-    <button class="nav-tab" id="tab-report" onclick="showPage('report', true)">Report</button>
+    <button class="nav-tab" id="tab-calendar" onclick="showPage('calendar',true)">📅 Calendar</button>
+    <button class="nav-tab" id="tab-admin" onclick="showPage('admin',true)">Admin</button>
+    <button class="nav-tab" id="tab-history" onclick="showPage('history',true)">History</button>
+    <button class="nav-tab" id="tab-report" onclick="showPage('report',true)">Report</button>
+    <button class="nav-tab" id="tab-settings" onclick="showPage('settings',true)">⚙️</button>
   </div>
 </nav>
 
-<!-- APPLY PAGE -->
+<!-- ═══════════ APPLY ═══════════ -->
 <div class="page active" id="page-apply">
   <h1>Apply Leave 🗓️</h1>
-  <p class="subtitle">Fill in the details. Admin will review and notify you via WhatsApp.</p>
+  <p class="subtitle">Fill in the details. Your request will be sent to admin for review.</p>
+
+  <div id="periodBanner"></div>
+
+  <div class="balance-card">
+    <div class="balance-title">📊 Your Leave Balance</div>
+    <div class="balance-row"><span class="balance-label">Annual Leave</span><span class="balance-days" style="color:var(--accent)" id="balAnnual">— days left</span></div>
+    <div class="bal-bar"><div class="bal-fill" id="barAnnual" style="background:var(--accent);width:0%"></div></div>
+    <div class="balance-row" style="margin-top:10px"><span class="balance-label">Medical Leave</span><span class="balance-days" style="color:var(--accent2)" id="balMedical">— days left</span></div>
+    <div class="bal-bar"><div class="bal-fill" id="barMedical" style="background:var(--accent2);width:0%"></div></div>
+    <p style="font-size:11px;color:var(--muted);margin-top:8px">Enter your name below to see your balance.</p>
+  </div>
 
   <div class="success-box" id="successBox">
     <div class="success-icon">✅</div>
     <h3>Request Submitted!</h3>
-    <p>Your leave request has been sent to admin for approval. You'll be notified once reviewed.</p>
+    <p>Your leave request has been sent for approval.<br>You'll be notified once reviewed.</p>
     <button class="btn-new" onclick="resetForm()">+ New Request</button>
   </div>
 
   <div id="applyForm">
     <div class="form-group">
       <label>Your Full Name</label>
-      <input type="text" id="empName" placeholder="e.g. Ahmad Faizal" autocomplete="name">
+      <input type="text" id="empName" placeholder="Enter your full name" autocomplete="name" oninput="updateBalance()">
     </div>
-
+    <div class="form-group">
+      <label>Department</label>
+      <select id="empDept"><option value="">— Select Department —</option></select>
+    </div>
     <div class="form-group">
       <label>Leave Type</label>
       <div class="leave-types">
-        <div class="leave-card" onclick="selectLeave(this,'Full Day')" data-type="Full Day">
-          <div class="icon">🌙</div>
-          <div class="lbl">Full Day</div>
-          <div class="desc">Entire day off</div>
-        </div>
-        <div class="leave-card" onclick="selectLeave(this,'Half Day AM')" data-type="Half Day AM">
-          <div class="icon">🌅</div>
-          <div class="lbl">Half Day AM</div>
-          <div class="desc">Morning off</div>
-        </div>
-        <div class="leave-card" onclick="selectLeave(this,'Half Day PM')" data-type="Half Day PM">
-          <div class="icon">🌇</div>
-          <div class="lbl">Half Day PM</div>
-          <div class="desc">Afternoon off</div>
-        </div>
-        <div class="leave-card" onclick="selectLeave(this,'Short Leave')" data-type="Short Leave">
-          <div class="icon">⏱️</div>
-          <div class="lbl">Short Leave</div>
-          <div class="desc">Few hours only</div>
-        </div>
+        <div class="leave-card" onclick="selectLeave(this,'Full Day')"><div class="icon">🌙</div><div class="lbl">Full Day</div><div class="desc">Entire day off</div></div>
+        <div class="leave-card" onclick="selectLeave(this,'Half Day AM')"><div class="icon">🌅</div><div class="lbl">Half Day AM</div><div class="desc">Morning off</div></div>
+        <div class="leave-card" onclick="selectLeave(this,'Half Day PM')"><div class="icon">🌇</div><div class="lbl">Half Day PM</div><div class="desc">Afternoon off</div></div>
+        <div class="leave-card" onclick="selectLeave(this,'Short Leave')"><div class="icon">⏱️</div><div class="lbl">Short Leave</div><div class="desc">Few hours only</div></div>
       </div>
     </div>
-
     <div class="form-group hours-row" id="hoursRow">
       <label>Hours Needed</label>
       <select id="hoursNeeded">
-        <option value="1">1 hour</option>
-        <option value="1.5">1.5 hours</option>
-        <option value="2">2 hours</option>
-        <option value="2.5">2.5 hours</option>
-        <option value="3">3 hours</option>
+        <option value="1">1 hour</option><option value="1.5">1.5 hours</option>
+        <option value="2">2 hours</option><option value="2.5">2.5 hours</option><option value="3">3 hours</option>
       </select>
     </div>
-
     <div class="form-group">
       <label>Leave Date(s)</label>
-      <div class="date-row">
-        <input type="date" id="dateFrom">
-        <input type="date" id="dateTo">
-      </div>
-      <div style="font-size:11px;color:var(--muted);margin-top:6px;">Leave end date empty if single day</div>
+      <div class="two-col"><input type="date" id="dateFrom"><input type="date" id="dateTo"></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:5px">Leave end date empty if single day</div>
     </div>
-
-    <div class="form-group">
-      <label>Reason</label>
-      <textarea id="reason" placeholder="e.g. Medical appointment, family matter..."></textarea>
-    </div>
-
-    <div class="form-group">
-      <label>Handover / Coverage Plan</label>
-      <textarea id="handover" placeholder="Who will cover your work? Any tasks to handover?"></textarea>
-    </div>
-
-    <button class="btn-submit" onclick="submitLeave()">Submit Request →</button>
+    <div class="form-group"><label>Reason</label><textarea id="reason" placeholder="e.g. Medical appointment, family matter..."></textarea></div>
+    <div class="form-group"><label>Handover / Coverage Plan</label><textarea id="handover" placeholder="Who will cover your work? Any tasks to handover?"></textarea></div>
+    <button class="btn-submit" id="submitBtn" onclick="submitLeave()">Submit Request →</button>
   </div>
 </div>
 
-<!-- ADMIN PAGE -->
+<!-- ═══════════ CALENDAR ═══════════ -->
+<div class="page" id="page-calendar">
+  <h1>Leave Calendar 📅</h1>
+  <p class="subtitle">Full monthly view — tap any date to see details.</p>
+  <div class="cal-nav no-print">
+    <button class="cal-btn" onclick="changeMonth(-1)">‹</button>
+    <h2 id="calMonthLabel"></h2>
+    <button class="cal-btn" onclick="changeMonth(1)">›</button>
+  </div>
+  <div class="cal-legend">
+    <div class="leg-item"><div class="leg-dot" style="background:rgba(74,222,128,0.3)"></div>Approved</div>
+    <div class="leg-item"><div class="leg-dot" style="background:rgba(251,146,60,0.3)"></div>Pending</div>
+    <div class="leg-item"><div class="leg-dot" style="background:rgba(248,113,113,0.2)"></div>Rejected</div>
+  </div>
+  <div class="cal-grid">
+    <div class="cal-header-row">
+      <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+    </div>
+    <div class="cal-body" id="calBody"></div>
+  </div>
+  <!-- Day detail panel shown below calendar -->
+  <div class="day-detail-panel" id="dayDetailPanel">
+    <div class="ddp-title" id="ddpTitle"></div>
+    <div id="ddpRows"></div>
+  </div>
+</div>
+
+<!-- ═══════════ ADMIN ═══════════ -->
 <div class="page" id="page-admin">
   <h1>Admin Panel 🛡️</h1>
-  <p class="subtitle">Review leave requests. Tap 💬 to notify employee via WhatsApp.</p>
-
+  <p class="subtitle" id="adminWelcome">Review leave requests.</p>
   <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-num orange" id="statPending">0</div>
-      <div class="stat-label">Pending</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num green" id="statApproved">0</div>
-      <div class="stat-label">Approved</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num blue" id="statTotal">0</div>
-      <div class="stat-label">Total</div>
-    </div>
+    <div class="stat-card"><div class="stat-num orange" id="statPending">0</div><div class="stat-label">Pending</div></div>
+    <div class="stat-card"><div class="stat-num green" id="statApproved">0</div><div class="stat-label">Approved</div></div>
+    <div class="stat-card"><div class="stat-num blue" id="statTotal">0</div><div class="stat-label">Total</div></div>
   </div>
-
   <div class="filter-tabs">
     <button class="filter-tab active" onclick="filterRequests('all',this)">All</button>
     <button class="filter-tab" onclick="filterRequests('Pending',this)">⏳ Pending</button>
     <button class="filter-tab" onclick="filterRequests('Approved',this)">✅ Approved</button>
     <button class="filter-tab" onclick="filterRequests('Rejected',this)">❌ Rejected</button>
   </div>
-
   <div id="requestsList"></div>
 </div>
 
-<!-- REPORT PAGE -->
+<!-- ═══════════ HISTORY ═══════════ -->
+<div class="page" id="page-history">
+  <h1>Employee History 👤</h1>
+  <p class="subtitle">Search an employee to view their full leave record.</p>
+  <div class="emp-search-wrap">
+    <input type="text" id="empSearch" placeholder="🔍  Search employee name..." oninput="searchEmployee()" autocomplete="off">
+    <div class="emp-list-drop" id="empDrop"></div>
+  </div>
+  <div class="history-header" id="histHeader"></div>
+  <div id="histList"></div>
+</div>
+
+<!-- ═══════════ REPORT ═══════════ -->
 <div class="page" id="page-report">
   <div class="report-header">
-    <div>
-      <h1>HR Report 📊</h1>
-      <p class="subtitle" style="margin-bottom:0">Weekly leave summary for HR</p>
+    <div><h1>HR Report 📊</h1><p class="subtitle" style="margin-bottom:0">Weekly leave summary</p></div>
+    <div class="report-btns no-print">
+      <button class="btn-export" onclick="exportCSV()">⬇ CSV</button>
     </div>
-    <button class="btn-export" onclick="exportCSV()">Export CSV</button>
   </div>
-
-  <div class="week-selector">
+  <div class="week-selector no-print">
     <span class="week-label">Period:</span>
-    <select id="weekSelect" onchange="renderReport()">
-      <option value="all">All Time</option>
-    </select>
+    <select id="weekSelect" onchange="renderReport()"><option value="all">All Time</option></select>
   </div>
-
   <div class="report-wrap">
     <table class="report-table">
-      <thead>
-        <tr>
-          <th>Name</th><th>Type</th><th>Date</th><th>Status</th><th>Reason</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Name</th><th>Dept</th><th>Type</th><th>Date</th><th>Status</th><th>Actioned By</th><th>Reason</th></tr></thead>
       <tbody id="reportBody"></tbody>
     </table>
+  </div>
+</div>
+
+<!-- ═══════════ SETTINGS ═══════════ -->
+<div class="page" id="page-settings">
+  <h1>Settings ⚙️</h1>
+  <p class="subtitle">Configure the app for your organisation.</p>
+
+  <!-- ADMINS -->
+  <div class="settings-section">
+    <h3>👥 Admin Accounts</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:13px">Each admin has their own name and PIN. You must be logged in as an existing admin to make changes.</p>
+    <div class="admin-list" id="adminList"></div>
+    <div class="add-admin-form">
+      <h4>➕ Add New Admin</h4>
+      <div class="form-group"><label>Admin Name</label><input type="text" id="newAdminName" placeholder="e.g. Sarah (HR)"></div>
+      <div class="form-group"><label>Role / Title</label><input type="text" id="newAdminRole" placeholder="e.g. HR Manager"></div>
+      <div class="two-col">
+        <div class="form-group"><label>PIN</label><input type="password" id="newAdminPin" placeholder="4 digits" maxlength="4" inputmode="numeric"></div>
+        <div class="form-group"><label>Confirm PIN</label><input type="password" id="newAdminPinConfirm" placeholder="Repeat" maxlength="4" inputmode="numeric"></div>
+      </div>
+      <button class="btn-save" onclick="addAdmin()">Add Admin</button>
+    </div>
+  </div>
+
+  <!-- DEPARTMENTS -->
+  <div class="settings-section">
+    <h3>🏢 Departments</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Add or remove department names used in the Apply form.</p>
+    <div class="dept-tags" id="deptTags"></div>
+    <div class="add-dept-row">
+      <input type="text" id="newDeptInput" placeholder="New department name" maxlength="40" onkeydown="if(event.key==='Enter')addDept()">
+      <button class="btn-add" onclick="addDept()">Add</button>
+    </div>
+  </div>
+
+  <!-- LEAVE PERIOD -->
+  <div class="settings-section">
+    <h3>⏰ Application Time Window</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Set the daily hours when employees <strong style="color:var(--text)">cannot</strong> submit leave requests. Outside these blocked hours, applications are open. Leave both empty to allow anytime.</p>
+
+    <!-- Toggle -->
+    <div class="toggle-row" id="periodToggleRow">
+      <span style="font-size:13px;font-weight:600">Enable blocked hours</span>
+      <div class="toggle-switch" id="periodToggle" onclick="togglePeriodEnabled()">
+        <div class="toggle-knob" id="periodKnob"></div>
+      </div>
+    </div>
+
+    <div id="periodFields" style="margin-top:14px">
+      <div class="two-col">
+        <div class="form-group">
+          <label>Block From</label>
+          <input type="time" id="blockFrom" value="00:00" oninput="updatePeriodPreview()">
+        </div>
+        <div class="form-group">
+          <label>Block Until</label>
+          <input type="time" id="blockTo" value="06:00" oninput="updatePeriodPreview()">
+        </div>
+      </div>
+      <div class="period-preview" id="periodPreview"></div>
+      <button class="btn-save" onclick="savePeriod()">Save Time Window</button>
+    </div>
+  </div>
+
+  <!-- LEAVE BALANCE -->
+  <div class="settings-section">
+    <h3>📊 Leave Balance Allowance</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:13px">Default annual allowance per employee.</p>
+    <div class="two-col">
+      <div class="form-group"><label>Annual Leave (days)</label><input type="number" id="settingAnnual" placeholder="14" min="1" max="60"></div>
+      <div class="form-group"><label>Medical Leave (days)</label><input type="number" id="settingMedical" placeholder="14" min="1" max="60"></div>
+    </div>
+    <button class="btn-save" onclick="saveBalanceSettings()">Save Allowance</button>
+  </div>
+
+  <!-- DATA -->
+  <div class="settings-section">
+    <h3>🗑️ Data Management</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Permanently delete all leave request data. Cannot be undone.</p>
+    <button class="btn-danger" onclick="clearAllData()">Clear All Data</button>
+  </div>
+
+  <div class="settings-section">
+    <h3>ℹ️ About</h3>
+    <p style="font-size:13px;color:var(--muted);line-height:1.6">LeaveEasy v3.0 — Mobile-first leave management. Share the URL in your WhatsApp group so employees can apply anytime, anywhere.</p>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-  let requests = JSON.parse(localStorage.getItem('leaveRequests') || '[]');
-  let adminUnlocked = false;
-  let pendingPage = null;
-  let currentFilter = 'all';
-  const ADMIN_PIN = '1234';
+// ════════════════════════════════════
+// STATE
+// ════════════════════════════════════
+let requests = JSON.parse(localStorage.getItem('leaveEasy_v2') || '[]');
+let adminUnlocked = false, pendingPage = null, currentFilter = 'all', selectedLeaveType = '';
+let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
+let currentAdminId = null, selectedAdminForPin = null;
 
-  function saveData() { localStorage.setItem('leaveRequests', JSON.stringify(requests)); }
+// Default admins (stored in localStorage)
+function getAdmins() {
+  const stored = localStorage.getItem('leaveAdmins');
+  if (stored) return JSON.parse(stored);
+  const defaults = [{ id: 1, name: 'Admin', role: 'System Admin', pin: '1234' }];
+  localStorage.setItem('leaveAdmins', JSON.stringify(defaults));
+  return defaults;
+}
+function saveAdmins(arr) { localStorage.setItem('leaveAdmins', JSON.stringify(arr)); }
 
-  // PIN inputs
-  document.querySelectorAll('.pin-input input').forEach((inp, i, arr) => {
-    inp.addEventListener('input', () => {
-      inp.value = inp.value.replace(/\D/g, '');
-      if (inp.value && i < arr.length - 1) arr[i+1].focus();
-    });
-    inp.addEventListener('keydown', e => {
-      if (e.key === 'Backspace' && !inp.value && i > 0) arr[i-1].focus();
-      if (e.key === 'Enter') checkPin();
-    });
-  });
+function getDepts() {
+  const stored = localStorage.getItem('leaveDepts');
+  if (stored) return JSON.parse(stored);
+  const defaults = ['Operations','HR','Finance','IT','Sales','Marketing','Management','Other'];
+  localStorage.setItem('leaveDepts', JSON.stringify(defaults));
+  return defaults;
+}
+function saveDepts(arr) { localStorage.setItem('leaveDepts', JSON.stringify(arr)); }
 
-  function checkPin() {
-    const pin = ['p1','p2','p3','p4'].map(id => document.getElementById(id).value).join('');
-    if (pin === ADMIN_PIN) {
-      adminUnlocked = true;
-      document.getElementById('pinOverlay').style.display = 'none';
-      document.getElementById('pinError').style.display = 'none';
-      if (pendingPage) {
-        activatePage(pendingPage);
-        pendingPage = null;
-      }
-    } else {
-      document.getElementById('pinError').style.display = 'block';
-      ['p1','p2','p3','p4'].forEach(id => { document.getElementById(id).value = ''; });
-      document.getElementById('p1').focus();
-    }
+function getSettings() { return JSON.parse(localStorage.getItem('leaveSettings') || '{"annual":14,"medical":14}'); }
+function getPeriod() { return JSON.parse(localStorage.getItem('leavePeriod') || '{"enabled":false,"from":"00:00","to":"06:00"}'); }
+function save() { localStorage.setItem('leaveEasy_v2', JSON.stringify(requests)); }
+
+// ════════════════════════════════════
+// PIN / ADMIN SELECT
+// ════════════════════════════════════
+function buildAdminSelectList() {
+  const admins = getAdmins();
+  const list = document.getElementById('adminSelectList');
+  list.innerHTML = admins.map(a => `
+    <div class="admin-select-item" onclick="pickAdmin(${a.id})">
+      <div style="font-size:26px">👤</div>
+      <div><div class="asi-name">${a.name}</div><div class="asi-role">${a.role}</div></div>
+    </div>`).join('');
+  document.getElementById('adminSelectList').style.display = 'block';
+  document.getElementById('pinStep').style.display = 'none';
+  document.getElementById('pinPromptText').textContent = 'Select an admin account';
+}
+
+function pickAdmin(id) {
+  selectedAdminForPin = id;
+  const admin = getAdmins().find(a => a.id === id);
+  document.getElementById('selectedAdminLabel').textContent = `🔐 Logging in as: ${admin.name}`;
+  document.getElementById('adminSelectList').style.display = 'none';
+  document.getElementById('pinStep').style.display = 'block';
+  document.getElementById('pinPromptText').textContent = 'Enter your 4-digit PIN';
+  document.getElementById('pinError').style.display = 'none';
+  ['p1','p2','p3','p4'].forEach(id=>document.getElementById(id).value='');
+  setTimeout(()=>document.getElementById('p1').focus(),100);
+}
+
+function backToAdminSelect() {
+  selectedAdminForPin = null;
+  buildAdminSelectList();
+}
+
+document.querySelectorAll('.pin-input input').forEach((inp, i, arr) => {
+  inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g,''); if (inp.value && i < arr.length-1) arr[i+1].focus(); });
+  inp.addEventListener('keydown', e => { if (e.key==='Backspace' && !inp.value && i>0) arr[i-1].focus(); if (e.key==='Enter') checkPin(); });
+});
+
+function checkPin() {
+  const pin = ['p1','p2','p3','p4'].map(id=>document.getElementById(id).value).join('');
+  const admin = getAdmins().find(a => a.id === selectedAdminForPin);
+  if (admin && pin === admin.pin) {
+    adminUnlocked = true;
+    currentAdminId = admin.id;
+    document.getElementById('pinOverlay').classList.remove('show');
+    document.getElementById('pinError').style.display = 'none';
+    ['p1','p2','p3','p4'].forEach(id=>document.getElementById(id).value='');
+    if (pendingPage) { activatePage(pendingPage); pendingPage = null; }
+  } else {
+    document.getElementById('pinError').style.display = 'block';
+    ['p1','p2','p3','p4'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('p1').focus();
+  }
+}
+
+// ════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════
+function activatePage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  if (id==='admin') renderAdmin();
+  if (id==='report') { populateWeeks(); renderReport(); }
+  if (id==='calendar') renderCalendar();
+  if (id==='history') { document.getElementById('empSearch').value=''; document.getElementById('histHeader').classList.remove('show'); document.getElementById('histList').innerHTML=''; }
+  if (id==='settings') loadSettings();
+}
+function showPage(id, requirePin) {
+  if (requirePin && !adminUnlocked) {
+    pendingPage = id;
+    buildAdminSelectList();
+    document.getElementById('pinOverlay').classList.add('show');
+    return;
+  }
+  activatePage(id);
+}
+
+// ════════════════════════════════════
+// DEPARTMENT DROPDOWN
+// ════════════════════════════════════
+function populateDeptDropdown() {
+  const sel = document.getElementById('empDept');
+  const depts = getDepts();
+  sel.innerHTML = '<option value="">— Select Department —</option>' + depts.map(d=>`<option>${d}</option>`).join('');
+}
+
+// ════════════════════════════════════
+// APPLICATION TIME WINDOW
+// ════════════════════════════════════
+function fmt12(t) {
+  if (!t) return '';
+  const [h,m] = t.split(':').map(Number);
+  const ampm = h < 12 ? 'AM' : 'PM';
+  const hh = h % 12 || 12;
+  return `${hh}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+
+function isPeriodOpen() {
+  const p = getPeriod();
+  if (!p.enabled) return true;
+  const now = new Date();
+  const cur = now.getHours() * 60 + now.getMinutes();
+  const [fh,fm] = p.from.split(':').map(Number);
+  const [th,tm] = p.to.split(':').map(Number);
+  const bFrom = fh*60+fm, bTo = th*60+tm;
+  // blocked if current time is inside the blocked window (handles overnight wrap)
+  if (bFrom < bTo) return !(cur >= bFrom && cur < bTo);
+  else return !(cur >= bFrom || cur < bTo); // overnight e.g. 22:00–06:00
+}
+
+function renderPeriodBanner() {
+  const p = getPeriod();
+  const bannerEl  = document.getElementById('periodBanner');
+  const formEl    = document.getElementById('applyForm');
+  const successEl = document.getElementById('successBox');
+  if (!bannerEl) return;
+  const open = isPeriodOpen();
+  // clear old closed block
+  const old = document.getElementById('closedBlock'); if (old) old.remove();
+
+  if (!p.enabled) {
+    bannerEl.innerHTML = `<div class="period-banner noperiod"><div class="period-icon">📋</div><div><div class="period-label">Applications Open</div><div class="period-dates">No time restriction — apply anytime</div></div></div>`;
+    if (formEl) formEl.style.display = 'block';
+    return;
   }
 
-  function activatePage(id) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('page-' + id).classList.add('active');
-    document.getElementById('tab-' + id).classList.add('active');
-    if (id === 'admin') renderAdmin();
-    if (id === 'report') { populateWeeks(); renderReport(); }
-  }
-
-  function showPage(id, requirePin) {
-    if (requirePin && !adminUnlocked) {
-      pendingPage = id;
-      document.getElementById('pinOverlay').style.display = 'flex';
-      setTimeout(() => document.getElementById('p1').focus(), 100);
-      return;
-    }
-    activatePage(id);
-  }
-
-  // Leave type selection
-  let selectedLeaveType = '';
-  function selectLeave(el, type) {
-    document.querySelectorAll('.leave-card').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-    selectedLeaveType = type;
-    document.getElementById('hoursRow').classList.toggle('visible', type === 'Short Leave');
-  }
-
-  // Submit leave
-  function submitLeave() {
-    const name = document.getElementById('empName').value.trim();
-    const dateFrom = document.getElementById('dateFrom').value;
-    const dateTo = document.getElementById('dateTo').value;
-    const reason = document.getElementById('reason').value.trim();
-    const handover = document.getElementById('handover').value.trim();
-    if (!name) { showToast('⚠️ Please enter your name'); return; }
-    if (!selectedLeaveType) { showToast('⚠️ Please select leave type'); return; }
-    if (!dateFrom) { showToast('⚠️ Please select a date'); return; }
-    if (!reason) { showToast('⚠️ Please enter a reason'); return; }
-    if (!handover) { showToast('⚠️ Please fill in handover details'); return; }
-    const hours = selectedLeaveType === 'Short Leave' ? document.getElementById('hoursNeeded').value : null;
-    requests.unshift({ id: Date.now(), name, leaveType: selectedLeaveType, dateFrom, dateTo, reason, handover, hours, status: 'Pending', submittedAt: new Date().toISOString() });
-    saveData();
-    document.getElementById('successBox').classList.add('visible');
-    document.getElementById('applyForm').style.display = 'none';
-  }
-
-  function resetForm() {
-    document.getElementById('successBox').classList.remove('visible');
-    document.getElementById('applyForm').style.display = 'block';
-    document.getElementById('empName').value = '';
-    document.getElementById('dateFrom').valueAsDate = new Date();
-    document.getElementById('dateTo').value = '';
-    document.getElementById('reason').value = '';
-    document.getElementById('handover').value = '';
-    document.querySelectorAll('.leave-card').forEach(c => c.classList.remove('selected'));
-    selectedLeaveType = '';
-    document.getElementById('hoursRow').classList.remove('visible');
-  }
-
-  // Admin
-  function renderAdmin() {
-    document.getElementById('statPending').textContent = requests.filter(r => r.status === 'Pending').length;
-    document.getElementById('statApproved').textContent = requests.filter(r => r.status === 'Approved').length;
-    document.getElementById('statTotal').textContent = requests.length;
-    const filtered = currentFilter === 'all' ? requests : requests.filter(r => r.status === currentFilter);
-    const container = document.getElementById('requestsList');
-    if (filtered.length === 0) {
-      container.innerHTML = `<div class="no-requests"><div class="big">📭</div><p>No requests found</p></div>`;
-      return;
-    }
-    container.innerHTML = filtered.map(r => {
-      const dateStr = r.dateTo ? `${fmtDate(r.dateFrom)} → ${fmtDate(r.dateTo)}` : fmtDate(r.dateFrom);
-      const hoursStr = r.hours ? ` (${r.hours}h)` : '';
-      const waMsg = encodeURIComponent(`Hi ${r.name},\n\nYour *${r.leaveType}* request for *${dateStr}* has been *${r.status}* ${r.status==='Approved'?'✅':'❌'}.\n\nThank you.\nAdmin`);
-      const actionBtns = r.status === 'Pending'
-        ? `<button class="btn-approve" onclick="updateStatus(${r.id},'Approved')">✅ Approve</button>
-           <button class="btn-reject" onclick="updateStatus(${r.id},'Rejected')">❌ Reject</button>
-           <a href="https://wa.me/?text=${waMsg}" target="_blank"><button class="btn-wa">💬</button></a>`
-        : `<a href="https://wa.me/?text=${waMsg}" target="_blank" style="flex:1"><button class="btn-wa" style="width:100%;border-radius:10px;padding:10px;border:none;background:rgba(37,211,102,0.12);color:#25d366;font-family:DM Sans,sans-serif;font-weight:600;font-size:13px;cursor:pointer;">💬 Notify via WhatsApp</button></a>`;
-      return `<div class="request-card">
-        <div class="req-header">
-          <div>
-            <div class="req-name">${r.name}</div>
-            <div class="req-date">Submitted ${timeAgo(r.submittedAt)}</div>
-          </div>
-          <span class="badge ${r.status.toLowerCase()}">${r.status}</span>
-        </div>
-        <div class="req-meta">
-          <div class="meta-chip"><strong>${r.leaveType}</strong>${hoursStr}</div>
-          <div class="meta-chip">📅 ${dateStr}</div>
-        </div>
-        <div class="req-reason">💬 ${r.reason}</div>
-        <div class="req-handover"><span>Handover:</span> ${r.handover}</div>
-        <div class="req-actions">${actionBtns}</div>
+  if (open) {
+    bannerEl.innerHTML = `<div class="period-banner active"><div class="period-icon">🟢</div><div><div class="period-label">Applications Open Now</div><div class="period-dates">Blocked daily: ${fmt12(p.from)} – ${fmt12(p.to)}</div></div></div>`;
+    if (formEl) formEl.style.display = 'block';
+  } else {
+    bannerEl.innerHTML = `<div class="period-banner inactive"><div class="period-icon">🔴</div><div><div class="period-label">Applications Closed</div><div class="period-dates">Blocked window: ${fmt12(p.from)} – ${fmt12(p.to)}<br>Please try again after ${fmt12(p.to)}.</div></div></div>`;
+    if (formEl) formEl.style.display = 'none';
+    if (successEl) successEl.classList.remove('visible');
+    const cb = document.createElement('div');
+    cb.id = 'closedBlock'; cb.className = 'closed-overlay';
+    cb.innerHTML = `<div style="font-size:44px;margin-bottom:12px">🚫</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;margin-bottom:8px">Applications Closed</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">
+        Blocked window: <strong style="color:var(--danger)">${fmt12(p.from)} – ${fmt12(p.to)}</strong><br>
+        Please try again after <strong>${fmt12(p.to)}</strong>.
       </div>`;
-    }).join('');
+    formEl.parentNode.insertBefore(cb, formEl.nextSibling);
   }
+}
 
-  function updateStatus(id, status) {
-    const r = requests.find(r => r.id === id);
-    if (r) { r.status = status; saveData(); renderAdmin(); showToast(status === 'Approved' ? '✅ Leave approved!' : '❌ Leave rejected'); }
-  }
+function togglePeriodEnabled() {
+  const p = getPeriod();
+  p.enabled = !p.enabled;
+  localStorage.setItem('leavePeriod', JSON.stringify(p));
+  loadPeriodSettings();
+  renderPeriodBanner();
+}
 
-  function filterRequests(filter, el) {
-    currentFilter = filter;
-    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    renderAdmin();
-  }
+function savePeriod() {
+  const from = document.getElementById('blockFrom').value;
+  const to   = document.getElementById('blockTo').value;
+  if (!from || !to) { showToast('⚠️ Set both times'); return; }
+  if (from === to)  { showToast('⚠️ Block-from and block-until cannot be the same time'); return; }
+  const p = getPeriod();
+  p.from = from; p.to = to; p.enabled = true;
+  localStorage.setItem('leavePeriod', JSON.stringify(p));
+  loadPeriodSettings();
+  renderPeriodBanner();
+  showToast('✅ Time window saved!');
+}
 
-  // Report
-  function populateWeeks() {
-    const sel = document.getElementById('weekSelect');
-    const cur = sel.value;
-    sel.innerHTML = '<option value="all">All Time</option>';
-    const weeks = new Set();
-    requests.forEach(r => {
-      const d = new Date(r.dateFrom + 'T00:00:00');
-      const mon = new Date(d);
-      mon.setDate(d.getDate() - ((d.getDay()+6)%7));
-      weeks.add(mon.toISOString().split('T')[0]);
-    });
-    [...weeks].sort().reverse().forEach(w => {
-      const end = new Date(w+'T00:00:00'); end.setDate(end.getDate()+6);
-      const opt = document.createElement('option');
-      opt.value = w;
-      opt.textContent = `Week: ${fmtDate(w)} – ${fmtDate(end.toISOString().split('T')[0])}`;
-      sel.appendChild(opt);
-    });
-    if (cur) sel.value = cur;
-  }
+function loadPeriodSettings() {
+  const p = getPeriod();
+  const toggle = document.getElementById('periodToggle');
+  const fields  = document.getElementById('periodFields');
+  if (toggle) toggle.classList.toggle('on', !!p.enabled);
+  if (fields)  fields.style.display = p.enabled ? 'block' : 'none';
+  const bf = document.getElementById('blockFrom');
+  const bt = document.getElementById('blockTo');
+  if (bf) bf.value = p.from || '00:00';
+  if (bt) bt.value = p.to   || '06:00';
+  updatePeriodPreview();
+}
 
-  function renderReport() {
-    const week = document.getElementById('weekSelect').value;
-    let filtered = requests;
-    if (week !== 'all') {
-      const start = new Date(week+'T00:00:00');
-      const end = new Date(week+'T00:00:00'); end.setDate(end.getDate()+6);
-      filtered = requests.filter(r => { const d = new Date(r.dateFrom+'T00:00:00'); return d >= start && d <= end; });
-    }
-    const body = document.getElementById('reportBody');
-    if (filtered.length === 0) {
-      body.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;">No records for this period</td></tr>`;
-      return;
-    }
-    body.innerHTML = filtered.map(r => {
-      const dateStr = r.dateTo ? `${fmtDate(r.dateFrom)}–${fmtDate(r.dateTo)}` : fmtDate(r.dateFrom);
-      const color = r.status==='Approved'?'var(--accent)':r.status==='Rejected'?'var(--danger)':'var(--warn)';
-      return `<tr>
-        <td style="font-weight:600">${r.name}</td>
-        <td>${r.leaveType}${r.hours?` (${r.hours}h)`:''}</td>
-        <td>${dateStr}</td>
-        <td style="color:${color};font-weight:600">${r.status}</td>
-        <td style="color:var(--muted)">${r.reason}</td>
-      </tr>`;
-    }).join('');
+function updatePeriodPreview() {
+  const fromEl = document.getElementById('blockFrom');
+  const toEl   = document.getElementById('blockTo');
+  const preEl  = document.getElementById('periodPreview');
+  if (!fromEl || !toEl || !preEl) return;
+  const from = fromEl.value || '00:00';
+  const to   = toEl.value   || '06:00';
+  const [fh,fm] = from.split(':').map(Number);
+  const [th,tm] = to.split(':').map(Number);
+  const fMin = fh*60+fm, tMin = th*60+tm;
+  const total = 1440;
+  // build segments: open (green) + blocked (red)
+  let segs = '';
+  if (fMin < tMin) {
+    // open: 0→fMin, blocked: fMin→tMin, open: tMin→1440
+    const o1 = (fMin/total*100).toFixed(2);
+    const bl = ((tMin-fMin)/total*100).toFixed(2);
+    const o2 = ((total-tMin)/total*100).toFixed(2);
+    if (parseFloat(o1)>0) segs += `<div style="width:${o1}%;background:rgba(74,222,128,0.45);height:100%;border-radius:3px 0 0 3px"></div>`;
+    segs += `<div style="width:${bl}%;background:rgba(248,113,113,0.65);height:100%"></div>`;
+    if (parseFloat(o2)>0) segs += `<div style="width:${o2}%;background:rgba(74,222,128,0.45);height:100%;border-radius:0 3px 3px 0"></div>`;
+  } else {
+    // overnight: blocked: 0→tMin, open: tMin→fMin, blocked: fMin→1440
+    const bl1 = (tMin/total*100).toFixed(2);
+    const op  = ((fMin-tMin)/total*100).toFixed(2);
+    const bl2 = ((total-fMin)/total*100).toFixed(2);
+    if (parseFloat(bl1)>0) segs += `<div style="width:${bl1}%;background:rgba(248,113,113,0.65);height:100%;border-radius:3px 0 0 3px"></div>`;
+    segs += `<div style="width:${op}%;background:rgba(74,222,128,0.45);height:100%"></div>`;
+    if (parseFloat(bl2)>0) segs += `<div style="width:${bl2}%;background:rgba(248,113,113,0.65);height:100%;border-radius:0 3px 3px 0"></div>`;
   }
+  const blockMins = fMin < tMin ? tMin-fMin : (total-fMin)+tMin;
+  const openMins  = total - blockMins;
+  const fmtMins = m => m>=60 ? `${Math.floor(m/60)}h ${m%60>0?m%60+'m':''}`.trim() : `${m}m`;
+  preEl.innerHTML = `
+    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">24-hour preview</div>
+    <div style="display:flex;height:12px;border-radius:4px;overflow:hidden;gap:1px;margin-bottom:8px">${segs}</div>
+    <div style="display:flex;gap:4px;font-size:10px;color:var(--muted);margin-bottom:6px">
+      <span>12 AM</span><span style="margin-left:auto">12 PM</span><span style="margin-left:auto">11 PM</span>
+    </div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px">
+      <span>🔴 Blocked: <strong style="color:var(--danger)">${fmt12(from)} – ${fmt12(to)}</strong> (${fmtMins(blockMins)})</span>
+      <span>🟢 Open: <strong style="color:var(--accent)">${fmtMins(openMins)}</strong> / day</span>
+    </div>`;
+}
 
-  function exportCSV() {
-    const week = document.getElementById('weekSelect').value;
-    let filtered = requests;
-    if (week !== 'all') {
-      const start = new Date(week+'T00:00:00'), end = new Date(week+'T00:00:00');
-      end.setDate(end.getDate()+6);
-      filtered = requests.filter(r => { const d = new Date(r.dateFrom+'T00:00:00'); return d>=start&&d<=end; });
-    }
-    const rows = [['Name','Leave Type','Hours','Date From','Date To','Reason','Handover','Status','Submitted At']];
-    filtered.forEach(r => rows.push([r.name,r.leaveType,r.hours||'',r.dateFrom,r.dateTo||'',r.reason,r.handover,r.status,r.submittedAt]));
-    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-    const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-    a.download = `leave-report-${week==='all'?'all':week}.csv`; a.click();
-    showToast('📊 CSV exported for HR!');
-  }
 
-  function fmtDate(str) {
-    if (!str) return '';
-    return new Date(str+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-  }
-  function timeAgo(iso) {
-    const s = (Date.now()-new Date(iso))/1000;
-    if (s<60) return 'just now';
-    if (s<3600) return Math.floor(s/60)+'m ago';
-    if (s<86400) return Math.floor(s/3600)+'h ago';
-    return Math.floor(s/86400)+'d ago';
-  }
-  function showToast(msg) {
-    const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),2800);
-  }
+function updateBalance() {
+  const name = document.getElementById('empName').value.trim().toLowerCase();
+  if (!name) return;
+  const s = getSettings();
+  const approved = requests.filter(r=>r.name.toLowerCase()===name && r.status==='Approved');
+  const annualUsed = approved.filter(r=>r.leaveType==='Full Day').length + approved.filter(r=>r.leaveType.startsWith('Half Day')).length*0.5;
+  const medUsed = approved.filter(r=>r.leaveType==='Medical').length;
+  const annLeft = Math.max(0, s.annual - annualUsed), medLeft = Math.max(0, s.medical - medUsed);
+  document.getElementById('balAnnual').textContent = annLeft + ' days left';
+  document.getElementById('balMedical').textContent = medLeft + ' days left';
+  document.getElementById('barAnnual').style.width = Math.round(annLeft/s.annual*100)+'%';
+  document.getElementById('barMedical').style.width = Math.round(medLeft/s.medical*100)+'%';
+}
 
-  // Init
+// ════════════════════════════════════
+// APPLY
+// ════════════════════════════════════
+function selectLeave(el, type) {
+  document.querySelectorAll('.leave-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected'); selectedLeaveType = type;
+  document.getElementById('hoursRow').classList.toggle('visible', type==='Short Leave');
+}
+function submitLeave() {
+  if (!isPeriodOpen()) { showToast('⛔ Leave applications are currently closed'); return; }
+  const name=document.getElementById('empName').value.trim(), dept=document.getElementById('empDept').value;
+  const dateFrom=document.getElementById('dateFrom').value, dateTo=document.getElementById('dateTo').value;
+  const reason=document.getElementById('reason').value.trim(), handover=document.getElementById('handover').value.trim();
+  if (!name) { showToast('⚠️ Please enter your name'); return; }
+  if (!dept) { showToast('⚠️ Please select your department'); return; }
+  if (!selectedLeaveType) { showToast('⚠️ Please select leave type'); return; }
+  if (!dateFrom) { showToast('⚠️ Please select a date'); return; }
+  if (!reason) { showToast('⚠️ Please enter a reason'); return; }
+  if (!handover) { showToast('⚠️ Please fill in handover details'); return; }
+  const hours = selectedLeaveType==='Short Leave' ? document.getElementById('hoursNeeded').value : null;
+  requests.unshift({ id:Date.now(), name, dept, leaveType:selectedLeaveType, dateFrom, dateTo, reason, handover, hours, status:'Pending', submittedAt:new Date().toISOString() });
+  save();
+  document.getElementById('successBox').classList.add('visible');
+  document.getElementById('applyForm').style.display = 'none';
+}
+function resetForm() {
+  document.getElementById('successBox').classList.remove('visible');
+  document.getElementById('applyForm').style.display = 'block';
+  ['empName','dateTo','reason','handover'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('empDept').value = '';
   document.getElementById('dateFrom').valueAsDate = new Date();
+  document.querySelectorAll('.leave-card').forEach(c=>c.classList.remove('selected'));
+  selectedLeaveType=''; document.getElementById('hoursRow').classList.remove('visible');
+}
 
-  // Sample data if empty
-  if (requests.length === 0) {
-    const today = new Date().toISOString().split('T')[0];
-    requests = [
-      {id:1,name:'Ahmad Faizal',leaveType:'Full Day',dateFrom:today,dateTo:'',reason:'Medical appointment',handover:'Covered by Ravi',hours:null,status:'Pending',submittedAt:new Date().toISOString()},
-      {id:2,name:'Siti Nora',leaveType:'Half Day AM',dateFrom:today,dateTo:'',reason:'School event',handover:'No handover needed',hours:null,status:'Approved',submittedAt:new Date(Date.now()-3600000).toISOString()},
-      {id:3,name:'Ravi Kumar',leaveType:'Short Leave',dateFrom:today,dateTo:'',reason:'Bank errand',handover:'Back by 3pm, Faizal to cover',hours:'2',status:'Pending',submittedAt:new Date(Date.now()-7200000).toISOString()},
-    ];
-    saveData();
+// ════════════════════════════════════
+// ADMIN
+// ════════════════════════════════════
+function renderAdmin() {
+  const admin = getAdmins().find(a=>a.id===currentAdminId);
+  if (admin) document.getElementById('adminWelcome').textContent = `Logged in as ${admin.name} · ${admin.role}`;
+  document.getElementById('statPending').textContent = requests.filter(r=>r.status==='Pending').length;
+  document.getElementById('statApproved').textContent = requests.filter(r=>r.status==='Approved').length;
+  document.getElementById('statTotal').textContent = requests.length;
+  const filtered = currentFilter==='all' ? requests : requests.filter(r=>r.status===currentFilter);
+  const container = document.getElementById('requestsList');
+  if (!filtered.length) { container.innerHTML=`<div class="no-requests"><div class="big">📭</div><p>No ${currentFilter==='all'?'':currentFilter.toLowerCase()+' '}requests found</p></div>`; return; }
+  container.innerHTML = filtered.map(r => {
+    const ds = r.dateTo && r.dateTo!==r.dateFrom ? `${fmtDate(r.dateFrom)} → ${fmtDate(r.dateTo)}` : fmtDate(r.dateFrom);
+    const waMsg = encodeURIComponent(`Hi ${r.name},\n\nYour *${r.leaveType}* request for *${ds}* has been *${r.status}* ${r.status==='Approved'?'✅':'❌'}.\n\nThank you.\nAdmin`);
+    const actionBtns = r.status==='Pending'
+      ? `<button class="btn-approve" onclick="updateStatus(${r.id},'Approved')">✅ Approve</button><button class="btn-reject" onclick="updateStatus(${r.id},'Rejected')">❌ Reject</button><a href="https://wa.me/?text=${waMsg}" target="_blank"><button class="btn-wa">💬</button></a>`
+      : `<a href="https://wa.me/?text=${waMsg}" target="_blank" style="flex:1"><button class="btn-wa" style="width:100%;border-radius:9px;padding:9px;border:none;background:rgba(37,211,102,0.1);color:#25d366;font-family:DM Sans,sans-serif;font-weight:600;font-size:12px;cursor:pointer">💬 Notify via WhatsApp</button></a>`;
+    const actionedLine = r.approvedBy
+      ? `<div class="approved-by">✅ Approved by <strong>${r.approvedBy}</strong>${r.approvedAt ? ' · '+timeAgo(r.approvedAt) : ''}</div>`
+      : r.rejectedBy
+      ? `<div class="rejected-by">❌ Rejected by <strong>${r.rejectedBy}</strong>${r.rejectedAt ? ' · '+timeAgo(r.rejectedAt) : ''}</div>`
+      : '';
+    return `<div class="request-card">
+      <div class="req-header">
+        <div><div class="req-name">${r.name}</div>${r.dept?`<div class="req-dept">${r.dept}</div>`:''}<div class="req-date">Submitted ${timeAgo(r.submittedAt)}</div></div>
+        <span class="badge ${r.status.toLowerCase()}">${r.status}</span>
+      </div>
+      <div class="req-meta"><div class="meta-chip"><strong>${r.leaveType}</strong>${r.hours?` (${r.hours}h)`:''}</div><div class="meta-chip">📅 ${ds}</div></div>
+      <div class="req-reason">💬 ${r.reason}</div>
+      <div class="req-handover"><span>Handover:</span> ${r.handover}</div>
+      ${actionedLine}
+      <div class="req-actions" style="margin-top:10px">${actionBtns}</div>
+    </div>`;
+  }).join('');
+}
+function updateStatus(id, status) {
+  const r = requests.find(r=>r.id===id);
+  if (r) {
+    r.status = status;
+    if (status === 'Approved') {
+      const admin = getAdmins().find(a=>a.id===currentAdminId);
+      r.approvedBy = admin ? admin.name : 'Admin';
+      r.approvedAt = new Date().toISOString();
+    } else if (status === 'Rejected') {
+      const admin = getAdmins().find(a=>a.id===currentAdminId);
+      r.approvedBy = null;
+      r.rejectedBy = admin ? admin.name : 'Admin';
+      r.rejectedAt = new Date().toISOString();
+    }
+    save(); renderAdmin(); showToast(status==='Approved'?'✅ Leave approved!':'❌ Leave rejected');
   }
+}
+function filterRequests(filter, el) {
+  currentFilter=filter; document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); renderAdmin();
+}
+
+// ════════════════════════════════════
+// CALENDAR — full names on every day
+// ════════════════════════════════════
+let selectedCalDay = null;
+
+function changeMonth(d) { calMonth+=d; if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+
+function renderCalendar() {
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calMonthLabel').textContent = `${months[calMonth]} ${calYear}`;
+  const firstDay=new Date(calYear,calMonth,1);
+  const lastDay=new Date(calYear,calMonth+1,0);
+  let startDow=firstDay.getDay(); startDow=startDow===0?6:startDow-1;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const totalCells=Math.ceil((startDow+lastDay.getDate())/7)*7;
+  let html='', dayCount=1-startDow;
+  for (let i=0;i<totalCells;i++) {
+    const d=new Date(calYear,calMonth,dayCount);
+    const isCurrentMonth=d.getMonth()===calMonth;
+    const isToday=d.getTime()===today.getTime();
+    const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const dayLeaves=isCurrentMonth ? requests.filter(r=>{
+      const [fy,fm,fd]=r.dateFrom.split('-').map(Number);
+      const from=new Date(fy,fm-1,fd);
+      const rArr=r.dateTo ? r.dateTo.split('-').map(Number) : null;
+      const to=rArr ? new Date(rArr[0],rArr[1]-1,rArr[2]) : from;
+      return d>=from&&d<=to;
+    }) : [];
+    let cls='cal-day'; if(!isCurrentMonth)cls+=' other-month'; if(isToday)cls+=' today';
+    // Show ALL names as pills
+    const pills = dayLeaves.map(r=>`<span class="leave-pill pill-${r.status.toLowerCase()}">${r.name.split(' ')[0]}</span>`).join('');
+    html+=`<div class="${cls}" onclick="showDayDetail('${iso}')">
+      <div class="day-num">${isCurrentMonth?d.getDate():''}</div>
+      ${pills}
+    </div>`;
+    dayCount++;
+  }
+  document.getElementById('calBody').innerHTML=html;
+  document.getElementById('dayDetailPanel').classList.remove('show');
+  selectedCalDay = null;
+}
+
+function showDayDetail(iso) {
+  // Parse date parts directly from ISO string to avoid timezone shifting
+  const [y,m,dd]=iso.split('-').map(Number);
+  const d=new Date(y,m-1,dd); // local midnight, no timezone offset
+  const dayLeaves=requests.filter(r=>{
+    const [fy,fm,fd]=r.dateFrom.split('-').map(Number);
+    const from=new Date(fy,fm-1,fd);
+    const to=r.dateTo ? (([ty,tm,td]=r.dateTo.split('-').map(Number)), new Date(ty,tm-1,td)) : from;
+    return d>=from&&d<=to;
+  });
+  const panel=document.getElementById('dayDetailPanel');
+  if (selectedCalDay===iso && panel.classList.contains('show')) {
+    panel.classList.remove('show'); selectedCalDay=null; return;
+  }
+  selectedCalDay=iso;
+  const label=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('ddpTitle').textContent = `📅 ${label}`;
+  if (!dayLeaves.length) {
+    document.getElementById('ddpRows').innerHTML=`<div style="font-size:13px;color:var(--muted);text-align:center;padding:12px">No leaves on this day</div>`;
+  } else {
+    document.getElementById('ddpRows').innerHTML=dayLeaves.map(r=>`
+      <div class="ddp-row">
+        <div>
+          <div class="ddp-name">${r.name}</div>
+          <div class="ddp-sub">${r.dept||''} · ${r.leaveType}${r.hours?` (${r.hours}h)`:''}</div>
+          <div class="ddp-sub" style="margin-top:2px">💬 ${r.reason}</div>
+          ${r.approvedBy ? `<div class="approved-by" style="margin-top:4px">✅ by ${r.approvedBy}</div>` : r.rejectedBy ? `<div class="rejected-by" style="margin-top:4px">❌ by ${r.rejectedBy}</div>` : ''}
+        </div>
+        <span class="badge ${r.status.toLowerCase()}">${r.status}</span>
+      </div>`).join('');
+  }
+  panel.classList.add('show');
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ════════════════════════════════════
+// HISTORY
+// ════════════════════════════════════
+function searchEmployee() {
+  const q=document.getElementById('empSearch').value.trim().toLowerCase();
+  const drop=document.getElementById('empDrop');
+  if (!q) { drop.classList.remove('show'); return; }
+  const names=[...new Set(requests.map(r=>r.name))].filter(n=>n.toLowerCase().includes(q));
+  if (!names.length) { drop.classList.remove('show'); return; }
+  drop.innerHTML=names.map(n=>{ const dept=requests.find(r=>r.name===n)?.dept||''; return `<div class="emp-option" onclick="selectEmployee('${n.replace(/'/g,"\\'")}')"><div>${n}</div>${dept?`<div class="opt-dept">${dept}</div>`:''}</div>`; }).join('');
+  drop.classList.add('show');
+}
+function selectEmployee(name) {
+  document.getElementById('empSearch').value=name;
+  document.getElementById('empDrop').classList.remove('show');
+  const empReqs=requests.filter(r=>r.name===name).sort((a,b)=>new Date(b.dateFrom)-new Date(a.dateFrom));
+  const dept=empReqs[0]?.dept||'—';
+  const hdr=document.getElementById('histHeader'); hdr.classList.add('show');
+  hdr.innerHTML=`<div class="hist-name">${name}</div><div class="hist-dept">${dept}</div>
+    <div class="hist-stats">
+      <div class="hist-stat"><div class="hist-stat-num" style="color:var(--accent)">${empReqs.filter(r=>r.status==='Approved').length}</div><div class="hist-stat-lbl">Approved</div></div>
+      <div class="hist-stat"><div class="hist-stat-num" style="color:var(--warn)">${empReqs.filter(r=>r.status==='Pending').length}</div><div class="hist-stat-lbl">Pending</div></div>
+      <div class="hist-stat"><div class="hist-stat-num" style="color:var(--accent2)">${empReqs.length}</div><div class="hist-stat-lbl">Total</div></div>
+    </div>`;
+  document.getElementById('histList').innerHTML = empReqs.length
+    ? empReqs.map(r=>{ const ds=r.dateTo&&r.dateTo!==r.dateFrom?`${fmtDate(r.dateFrom)} → ${fmtDate(r.dateTo)}`:fmtDate(r.dateFrom); const byLine = r.approvedBy?`<div class="approved-by" style="margin-top:5px">✅ Approved by ${r.approvedBy}</div>`:r.rejectedBy?`<div class="rejected-by" style="margin-top:5px">❌ Rejected by ${r.rejectedBy}</div>`:''; return `<div class="request-card"><div class="req-header"><div><div class="req-name" style="font-size:13px">${r.leaveType}${r.hours?` (${r.hours}h)`:''}</div><div class="req-date">📅 ${ds}</div></div><span class="badge ${r.status.toLowerCase()}">${r.status}</span></div><div class="req-reason">💬 ${r.reason}</div>${byLine}</div>`; }).join('')
+    : `<div class="no-requests"><div class="big">📭</div><p>No records found.</p></div>`;
+}
+document.addEventListener('click', e=>{ if (!e.target.closest('.emp-search-wrap')) document.getElementById('empDrop').classList.remove('show'); });
+
+// ════════════════════════════════════
+// REPORT
+// ════════════════════════════════════
+function populateWeeks() {
+  const sel=document.getElementById('weekSelect'), cur=sel.value;
+  sel.innerHTML='<option value="all">All Time</option>';
+  const weeks=new Set();
+  requests.forEach(r=>{ const d=new Date(r.dateFrom+'T00:00:00'),mon=new Date(d); mon.setDate(d.getDate()-((d.getDay()+6)%7)); weeks.add(mon.toISOString().split('T')[0]); });
+  [...weeks].sort().reverse().forEach(w=>{ const end=new Date(w+'T00:00:00'); end.setDate(end.getDate()+6); const opt=document.createElement('option'); opt.value=w; opt.textContent=`${fmtDate(w)} – ${fmtDate(end.toISOString().split('T')[0])}`; sel.appendChild(opt); });
+  if (cur) sel.value=cur;
+}
+function renderReport() {
+  const week=document.getElementById('weekSelect').value;
+  let filtered=requests;
+  if (week!=='all') { const start=new Date(week+'T00:00:00'),end=new Date(week+'T00:00:00'); end.setDate(end.getDate()+6); filtered=requests.filter(r=>{ const d=new Date(r.dateFrom+'T00:00:00'); return d>=start&&d<=end; }); }
+  const body=document.getElementById('reportBody');
+  if (!filtered.length) { body.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:26px">No records for this period</td></tr>`; return; }
+  body.innerHTML=filtered.map(r=>{ const ds=r.dateTo&&r.dateTo!==r.dateFrom?`${fmtDate(r.dateFrom)}–${fmtDate(r.dateTo)}`:fmtDate(r.dateFrom); const color=r.status==='Approved'?'var(--accent)':r.status==='Rejected'?'var(--danger)':'var(--warn)'; const actioned=r.approvedBy?r.approvedBy:r.rejectedBy?r.rejectedBy:'—'; return `<tr><td style="font-weight:700">${r.name}</td><td style="color:var(--accent2)">${r.dept||'—'}</td><td>${r.leaveType}${r.hours?` (${r.hours}h)`:''}</td><td style="white-space:nowrap">${ds}</td><td style="color:${color};font-weight:700">${r.status}</td><td style="color:var(--muted)">${actioned}</td><td style="color:var(--muted)">${r.reason}</td></tr>`; }).join('');
+}
+function exportCSV() {
+  if (!requests.length) { showToast('⚠️ No data to export'); return; }
+  const week=document.getElementById('weekSelect').value;
+  let filtered=requests;
+  if (week!=='all') { const start=new Date(week+'T00:00:00'),end=new Date(week+'T00:00:00'); end.setDate(end.getDate()+6); filtered=requests.filter(r=>{ const d=new Date(r.dateFrom+'T00:00:00'); return d>=start&&d<=end; }); }
+  const rows=[['Name','Department','Leave Type','Hours','Date From','Date To','Reason','Handover','Status','Actioned By','Submitted At']];
+  filtered.forEach(r=>rows.push([r.name,r.dept||'',r.leaveType,r.hours||'',r.dateFrom,r.dateTo||'',r.reason,r.handover,r.status,r.approvedBy||r.rejectedBy||'',r.submittedAt]));
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download=`leave-report-${week==='all'?'all':week}.csv`; a.click();
+  showToast('📊 CSV exported for HR!');
+}
+
+// ════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════
+function loadSettings() {
+  const s=getSettings();
+  document.getElementById('settingAnnual').value=s.annual;
+  document.getElementById('settingMedical').value=s.medical;
+  renderAdminList();
+  renderDeptTags();
+  loadPeriodSettings();
+}
+
+// ── Admins ──
+function renderAdminList() {
+  const admins=getAdmins();
+  document.getElementById('adminList').innerHTML = admins.map(a=>`
+    <div class="admin-item">
+      <div class="admin-item-info">
+        <div class="admin-item-name">👤 ${a.name}</div>
+        <div class="admin-item-role">${a.role}</div>
+        <div class="admin-item-pin">PIN: ${'•'.repeat(a.pin.length)}</div>
+      </div>
+      ${admins.length>1 ? `<button class="btn-remove-admin" onclick="removeAdmin(${a.id})">Remove</button>` : '<span style="font-size:11px;color:var(--muted)">Primary</span>'}
+    </div>`).join('');
+}
+function addAdmin() {
+  const name=document.getElementById('newAdminName').value.trim();
+  const role=document.getElementById('newAdminRole').value.trim();
+  const pin=document.getElementById('newAdminPin').value;
+  const pinC=document.getElementById('newAdminPinConfirm').value;
+  if (!name) { showToast('⚠️ Enter admin name'); return; }
+  if (!/^\d{4}$/.test(pin)) { showToast('⚠️ PIN must be 4 digits'); return; }
+  if (pin!==pinC) { showToast('⚠️ PINs do not match'); return; }
+  const admins=getAdmins();
+  const newId=Date.now();
+  admins.push({ id:newId, name, role:role||'Admin', pin });
+  saveAdmins(admins);
+  ['newAdminName','newAdminRole','newAdminPin','newAdminPinConfirm'].forEach(id=>document.getElementById(id).value='');
+  renderAdminList();
+  showToast('✅ Admin added!');
+}
+function removeAdmin(id) {
+  const admins=getAdmins();
+  if (admins.length<=1) { showToast('⚠️ Cannot remove the last admin'); return; }
+  if (!confirm('Remove this admin account?')) return;
+  saveAdmins(admins.filter(a=>a.id!==id));
+  renderAdminList();
+  showToast('🗑️ Admin removed');
+}
+
+// ── Departments ──
+function renderDeptTags() {
+  const depts=getDepts();
+  document.getElementById('deptTags').innerHTML = depts.map(d=>`
+    <div class="dept-tag">
+      <span>${d}</span>
+      <button class="remove-dept" onclick="removeDept('${d.replace(/'/g,"\\'")}')">✕</button>
+    </div>`).join('');
+  populateDeptDropdown();
+}
+function addDept() {
+  const val=document.getElementById('newDeptInput').value.trim();
+  if (!val) return;
+  const depts=getDepts();
+  if (depts.map(d=>d.toLowerCase()).includes(val.toLowerCase())) { showToast('⚠️ Department already exists'); return; }
+  depts.push(val);
+  saveDepts(depts);
+  document.getElementById('newDeptInput').value='';
+  renderDeptTags();
+  showToast('✅ Department added!');
+}
+function removeDept(name) {
+  const depts=getDepts().filter(d=>d!==name);
+  saveDepts(depts);
+  renderDeptTags();
+  showToast('🗑️ Department removed');
+}
+
+function saveBalanceSettings() {
+  const annual=parseInt(document.getElementById('settingAnnual').value)||14;
+  const medical=parseInt(document.getElementById('settingMedical').value)||14;
+  localStorage.setItem('leaveSettings', JSON.stringify({annual,medical}));
+  showToast('✅ Leave allowance saved!');
+}
+function clearAllData() {
+  if (!confirm('Are you sure? This will permanently delete ALL leave data and cannot be undone.')) return;
+  requests=[]; save(); showToast('🗑️ All data cleared.');
+}
+
+// ════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════
+function fmtDate(str) { if(!str)return''; return new Date(str+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
+function timeAgo(iso) { const s=(Date.now()-new Date(iso))/1000; if(s<60)return'just now'; if(s<3600)return Math.floor(s/60)+'m ago'; if(s<86400)return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+
+// ════════════════════════════════════
+// INIT — fresh, no sample data
+// ════════════════════════════════════
+document.getElementById('dateFrom').valueAsDate = new Date();
+populateDeptDropdown();
+renderPeriodBanner();
 </script>
 </body>
 </html>
