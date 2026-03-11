@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>LeaveEasy — Leave Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --accent: #4ade80;
+    --accent2: #22d3ee;
+    --warn: #fb923c;
+    --danger: #f87171;
+    --text: #f1f5f9;
+    --muted: #64748b;
+    --border: #2e3347;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+  }
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--accent); letter-spacing: -0.5px; }
+  .nav-logo span { color: var(--text); }
+  .nav-tabs { display: flex; gap: 6px; }
+  .nav-tab {
+    padding: 7px 14px; border-radius: 30px; border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    background: transparent; color: var(--muted); transition: all 0.2s;
+  }
+  .nav-tab.active { background: var(--accent); color: #0f1117; }
+
+  .page { display: none; padding: 24px 20px 100px; max-width: 520px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  h1 { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 28px; line-height: 1.5; }
+
+  .form-group { margin-bottom: 18px; }
+  label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  input, select, textarea {
+    width: 100%; padding: 14px 16px; background: var(--surface2);
+    border: 1.5px solid var(--border); border-radius: var(--radius);
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px;
+    outline: none; transition: border-color 0.2s; -webkit-appearance: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 90px; }
+  select option { background: var(--surface2); }
+  .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .leave-types { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+  .leave-card {
+    padding: 14px 12px; border-radius: var(--radius); border: 2px solid var(--border);
+    cursor: pointer; text-align: center; transition: all 0.2s; background: var(--surface2);
+  }
+  .leave-card:hover { border-color: var(--accent); }
+  .leave-card.selected { border-color: var(--accent); background: rgba(74,222,128,0.08); }
+  .leave-card .icon { font-size: 22px; margin-bottom: 6px; }
+  .leave-card .lbl { font-size: 12px; font-weight: 600; }
+  .leave-card .desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .hours-row { display: none; }
+  .hours-row.visible { display: block; }
+
+  .btn-submit {
+    width: 100%; padding: 16px; background: var(--accent);
+    color: #0f1117; font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 16px; border: none; border-radius: var(--radius);
+    cursor: pointer; transition: all 0.2s; margin-top: 8px;
+  }
+  .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(74,222,128,0.25); }
+
+  .success-box {
+    background: rgba(74,222,128,0.1); border: 1.5px solid var(--accent);
+    border-radius: var(--radius); padding: 20px; text-align: center;
+    display: none; margin-bottom: 24px;
+  }
+  .success-box.visible { display: block; }
+  .success-icon { font-size: 36px; margin-bottom: 8px; }
+  .success-box h3 { font-family: 'Syne', sans-serif; color: var(--accent); margin-bottom: 6px; }
+  .success-box p { font-size: 13px; color: var(--muted); }
+  .btn-new { display:inline-block; margin-top:14px; padding: 10px 20px; background: var(--surface2); color: var(--text); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size:13px; cursor:pointer; }
+
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 12px; text-align: center; }
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; }
+  .stat-num.green { color: var(--accent); }
+  .stat-num.orange { color: var(--warn); }
+  .stat-num.blue { color: var(--accent2); }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  .filter-tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+  .filter-tab {
+    padding: 7px 14px; border-radius: 30px; border: 1.5px solid var(--border);
+    background: transparent; color: var(--muted); font-size: 12px; font-weight: 500;
+    cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .filter-tab.active { background: var(--surface2); border-color: var(--accent2); color: var(--accent2); }
+
+  .request-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+  }
+  .req-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .req-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
+  .req-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .badge.pending { background: rgba(251,146,60,0.15); color: var(--warn); }
+  .badge.approved { background: rgba(74,222,128,0.12); color: var(--accent); }
+  .badge.rejected { background: rgba(248,113,113,0.12); color: var(--danger); }
+
+  .req-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .meta-chip { padding: 4px 10px; border-radius: 8px; font-size: 12px; background: var(--surface2); color: var(--muted); }
+  .meta-chip strong { color: var(--text); }
+
+  .req-reason { font-size: 13px; color: var(--muted); margin-bottom: 10px; line-height: 1.4; }
+  .req-handover { font-size: 12px; color: var(--muted); background: var(--surface2); border-radius: 8px; padding: 8px 10px; margin-bottom: 12px; }
+  .req-handover span { color: var(--accent2); font-weight: 500; }
+
+  .req-actions { display: flex; gap: 8px; }
+  .btn-approve, .btn-reject, .btn-wa {
+    flex: 1; padding: 10px; border-radius: 10px; border: none;
+    font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 13px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-approve { background: rgba(74,222,128,0.15); color: var(--accent); }
+  .btn-approve:hover { background: var(--accent); color: #0f1117; }
+  .btn-reject { background: rgba(248,113,113,0.1); color: var(--danger); }
+  .btn-reject:hover { background: var(--danger); color: #fff; }
+  .btn-wa { background: rgba(37,211,102,0.12); color: #25d366; flex: 0 0 auto; padding: 10px 14px; }
+
+  .no-requests { text-align: center; padding: 40px 20px; color: var(--muted); }
+  .no-requests .big { font-size: 36px; margin-bottom: 10px; }
+
+  .report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 10px; }
+  .btn-export { padding: 10px 18px; background: var(--accent2); color: #0f1117; border: none; border-radius: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
+  .report-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .report-table th { background: var(--surface2); color: var(--muted); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; padding: 10px 8px; text-align: left; }
+  .report-table td { padding: 10px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .report-table tr:last-child td { border-bottom: none; }
+  .report-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; overflow-x: auto; }
+
+  .pin-overlay {
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 999; padding: 24px;
+  }
+  .pin-box { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 32px 24px; max-width: 340px; width: 100%; text-align: center; }
+  .pin-box h2 { font-family: 'Syne', sans-serif; font-size: 1.3rem; margin-bottom: 8px; }
+  .pin-box p { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .pin-input { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+  .pin-input input { width: 50px; height: 56px; text-align: center; font-size: 22px; font-weight: 700; border-radius: 12px; }
+  .pin-error { color: var(--danger); font-size: 13px; margin-top: -10px; margin-bottom: 12px; display: none; }
+  .btn-pin { width: 100%; padding: 14px; background: var(--accent); color: #0f1117; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; border: none; border-radius: var(--radius); cursor: pointer; }
+
+  .toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 30px;
+    padding: 10px 20px; font-size: 13px; z-index: 9999; opacity: 0;
+    transition: all 0.3s; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .week-selector { display: flex; align-items: center; gap: 10px; background: var(--surface2); border-radius: 12px; padding: 8px 14px; margin-bottom: 20px; }
+  .week-selector select { background: transparent; border: none; color: var(--text); font-size: 13px; font-weight: 500; flex: 1; }
+  .week-label { font-size: 12px; color: var(--muted); }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ADMIN PIN OVERLAY -->
+<div class="pin-overlay" id="pinOverlay" style="display:none;">
+  <div class="pin-box">
+    <div style="font-size:36px;margin-bottom:12px;">🔐</div>
+    <h2>Admin Access</h2>
+    <p>Enter your 4-digit admin PIN to continue</p>
+    <div class="pin-input">
+      <input type="password" maxlength="1" id="p1" inputmode="numeric">
+      <input type="password" maxlength="1" id="p2" inputmode="numeric">
+      <input type="password" maxlength="1" id="p3" inputmode="numeric">
+      <input type="password" maxlength="1" id="p4" inputmode="numeric">
+    </div>
+    <p class="pin-error" id="pinError">❌ Incorrect PIN. Try again.</p>
+    <button class="btn-pin" onclick="checkPin()">Unlock</button>
+    <p style="font-size:11px;color:var(--muted);margin-top:14px;">Default PIN: <strong>1234</strong></p>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">Leave<span>Easy</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" id="tab-apply" onclick="showPage('apply')">Apply</button>
+    <button class="nav-tab" id="tab-admin" onclick="showPage('admin', true)">Admin</button>
+    <button class="nav-tab" id="tab-report" onclick="showPage('report', true)">Report</button>
+  </div>
+</nav>
+
+<!-- APPLY PAGE -->
+<div class="page active" id="page-apply">
+  <h1>Apply Leave 🗓️</h1>
+  <p class="subtitle">Fill in the details. Admin will review and notify you via WhatsApp.</p>
+
+  <div class="success-box" id="successBox">
+    <div class="success-icon">✅</div>
+    <h3>Request Submitted!</h3>
+    <p>Your leave request has been sent to admin for approval. You'll be notified once reviewed.</p>
+    <button class="btn-new" onclick="resetForm()">+ New Request</button>
+  </div>
+
+  <div id="applyForm">
+    <div class="form-group">
+      <label>Your Full Name</label>
+      <input type="text" id="empName" placeholder="e.g. Ahmad Faizal" autocomplete="name">
+    </div>
+
+    <div class="form-group">
+      <label>Leave Type</label>
+      <div class="leave-types">
+        <div class="leave-card" onclick="selectLeave(this,'Full Day')" data-type="Full Day">
+          <div class="icon">🌙</div>
+          <div class="lbl">Full Day</div>
+          <div class="desc">Entire day off</div>
+        </div>
+        <div class="leave-card" onclick="selectLeave(this,'Half Day AM')" data-type="Half Day AM">
+          <div class="icon">🌅</div>
+          <div class="lbl">Half Day AM</div>
+          <div class="desc">Morning off</div>
+        </div>
+        <div class="leave-card" onclick="selectLeave(this,'Half Day PM')" data-type="Half Day PM">
+          <div class="icon">🌇</div>
+          <div class="lbl">Half Day PM</div>
+          <div class="desc">Afternoon off</div>
+        </div>
+        <div class="leave-card" onclick="selectLeave(this,'Short Leave')" data-type="Short Leave">
+          <div class="icon">⏱️</div>
+          <div class="lbl">Short Leave</div>
+          <div class="desc">Few hours only</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group hours-row" id="hoursRow">
+      <label>Hours Needed</label>
+      <select id="hoursNeeded">
+        <option value="1">1 hour</option>
+        <option value="1.5">1.5 hours</option>
+        <option value="2">2 hours</option>
+        <option value="2.5">2.5 hours</option>
+        <option value="3">3 hours</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Leave Date(s)</label>
+      <div class="date-row">
+        <input type="date" id="dateFrom">
+        <input type="date" id="dateTo">
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;">Leave end date empty if single day</div>
+    </div>
+
+    <div class="form-group">
+      <label>Reason</label>
+      <textarea id="reason" placeholder="e.g. Medical appointment, family matter..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Handover / Coverage Plan</label>
+      <textarea id="handover" placeholder="Who will cover your work? Any tasks to handover?"></textarea>
+    </div>
+
+    <button class="btn-submit" onclick="submitLeave()">Submit Request →</button>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div class="page" id="page-admin">
+  <h1>Admin Panel 🛡️</h1>
+  <p class="subtitle">Review leave requests. Tap 💬 to notify employee via WhatsApp.</p>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num orange" id="statPending">0</div>
+      <div class="stat-label">Pending</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num green" id="statApproved">0</div>
+      <div class="stat-label">Approved</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num blue" id="statTotal">0</div>
+      <div class="stat-label">Total</div>
+    </div>
+  </div>
+
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterRequests('all',this)">All</button>
+    <button class="filter-tab" onclick="filterRequests('Pending',this)">⏳ Pending</button>
+    <button class="filter-tab" onclick="filterRequests('Approved',this)">✅ Approved</button>
+    <button class="filter-tab" onclick="filterRequests('Rejected',this)">❌ Rejected</button>
+  </div>
+
+  <div id="requestsList"></div>
+</div>
+
+<!-- REPORT PAGE -->
+<div class="page" id="page-report">
+  <div class="report-header">
+    <div>
+      <h1>HR Report 📊</h1>
+      <p class="subtitle" style="margin-bottom:0">Weekly leave summary for HR</p>
+    </div>
+    <button class="btn-export" onclick="exportCSV()">Export CSV</button>
+  </div>
+
+  <div class="week-selector">
+    <span class="week-label">Period:</span>
+    <select id="weekSelect" onchange="renderReport()">
+      <option value="all">All Time</option>
+    </select>
+  </div>
+
+  <div class="report-wrap">
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Name</th><th>Type</th><th>Date</th><th>Status</th><th>Reason</th>
+        </tr>
+      </thead>
+      <tbody id="reportBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let requests = JSON.parse(localStorage.getItem('leaveRequests') || '[]');
+  let adminUnlocked = false;
+  let pendingPage = null;
+  let currentFilter = 'all';
+  const ADMIN_PIN = '1234';
+
+  function saveData() { localStorage.setItem('leaveRequests', JSON.stringify(requests)); }
+
+  // PIN inputs
+  document.querySelectorAll('.pin-input input').forEach((inp, i, arr) => {
+    inp.addEventListener('input', () => {
+      inp.value = inp.value.replace(/\D/g, '');
+      if (inp.value && i < arr.length - 1) arr[i+1].focus();
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !inp.value && i > 0) arr[i-1].focus();
+      if (e.key === 'Enter') checkPin();
+    });
+  });
+
+  function checkPin() {
+    const pin = ['p1','p2','p3','p4'].map(id => document.getElementById(id).value).join('');
+    if (pin === ADMIN_PIN) {
+      adminUnlocked = true;
+      document.getElementById('pinOverlay').style.display = 'none';
+      document.getElementById('pinError').style.display = 'none';
+      if (pendingPage) {
+        activatePage(pendingPage);
+        pendingPage = null;
+      }
+    } else {
+      document.getElementById('pinError').style.display = 'block';
+      ['p1','p2','p3','p4'].forEach(id => { document.getElementById(id).value = ''; });
+      document.getElementById('p1').focus();
+    }
+  }
+
+  function activatePage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    document.getElementById('tab-' + id).classList.add('active');
+    if (id === 'admin') renderAdmin();
+    if (id === 'report') { populateWeeks(); renderReport(); }
+  }
+
+  function showPage(id, requirePin) {
+    if (requirePin && !adminUnlocked) {
+      pendingPage = id;
+      document.getElementById('pinOverlay').style.display = 'flex';
+      setTimeout(() => document.getElementById('p1').focus(), 100);
+      return;
+    }
+    activatePage(id);
+  }
+
+  // Leave type selection
+  let selectedLeaveType = '';
+  function selectLeave(el, type) {
+    document.querySelectorAll('.leave-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedLeaveType = type;
+    document.getElementById('hoursRow').classList.toggle('visible', type === 'Short Leave');
+  }
+
+  // Submit leave
+  function submitLeave() {
+    const name = document.getElementById('empName').value.trim();
+    const dateFrom = document.getElementById('dateFrom').value;
+    const dateTo = document.getElementById('dateTo').value;
+    const reason = document.getElementById('reason').value.trim();
+    const handover = document.getElementById('handover').value.trim();
+    if (!name) { showToast('⚠️ Please enter your name'); return; }
+    if (!selectedLeaveType) { showToast('⚠️ Please select leave type'); return; }
+    if (!dateFrom) { showToast('⚠️ Please select a date'); return; }
+    if (!reason) { showToast('⚠️ Please enter a reason'); return; }
+    if (!handover) { showToast('⚠️ Please fill in handover details'); return; }
+    const hours = selectedLeaveType === 'Short Leave' ? document.getElementById('hoursNeeded').value : null;
+    requests.unshift({ id: Date.now(), name, leaveType: selectedLeaveType, dateFrom, dateTo, reason, handover, hours, status: 'Pending', submittedAt: new Date().toISOString() });
+    saveData();
+    document.getElementById('successBox').classList.add('visible');
+    document.getElementById('applyForm').style.display = 'none';
+  }
+
+  function resetForm() {
+    document.getElementById('successBox').classList.remove('visible');
+    document.getElementById('applyForm').style.display = 'block';
+    document.getElementById('empName').value = '';
+    document.getElementById('dateFrom').valueAsDate = new Date();
+    document.getElementById('dateTo').value = '';
+    document.getElementById('reason').value = '';
+    document.getElementById('handover').value = '';
+    document.querySelectorAll('.leave-card').forEach(c => c.classList.remove('selected'));
+    selectedLeaveType = '';
+    document.getElementById('hoursRow').classList.remove('visible');
+  }
+
+  // Admin
+  function renderAdmin() {
+    document.getElementById('statPending').textContent = requests.filter(r => r.status === 'Pending').length;
+    document.getElementById('statApproved').textContent = requests.filter(r => r.status === 'Approved').length;
+    document.getElementById('statTotal').textContent = requests.length;
+    const filtered = currentFilter === 'all' ? requests : requests.filter(r => r.status === currentFilter);
+    const container = document.getElementById('requestsList');
+    if (filtered.length === 0) {
+      container.innerHTML = `<div class="no-requests"><div class="big">📭</div><p>No requests found</p></div>`;
+      return;
+    }
+    container.innerHTML = filtered.map(r => {
+      const dateStr = r.dateTo ? `${fmtDate(r.dateFrom)} → ${fmtDate(r.dateTo)}` : fmtDate(r.dateFrom);
+      const hoursStr = r.hours ? ` (${r.hours}h)` : '';
+      const waMsg = encodeURIComponent(`Hi ${r.name},\n\nYour *${r.leaveType}* request for *${dateStr}* has been *${r.status}* ${r.status==='Approved'?'✅':'❌'}.\n\nThank you.\nAdmin`);
+      const actionBtns = r.status === 'Pending'
+        ? `<button class="btn-approve" onclick="updateStatus(${r.id},'Approved')">✅ Approve</button>
+           <button class="btn-reject" onclick="updateStatus(${r.id},'Rejected')">❌ Reject</button>
+           <a href="https://wa.me/?text=${waMsg}" target="_blank"><button class="btn-wa">💬</button></a>`
+        : `<a href="https://wa.me/?text=${waMsg}" target="_blank" style="flex:1"><button class="btn-wa" style="width:100%;border-radius:10px;padding:10px;border:none;background:rgba(37,211,102,0.12);color:#25d366;font-family:DM Sans,sans-serif;font-weight:600;font-size:13px;cursor:pointer;">💬 Notify via WhatsApp</button></a>`;
+      return `<div class="request-card">
+        <div class="req-header">
+          <div>
+            <div class="req-name">${r.name}</div>
+            <div class="req-date">Submitted ${timeAgo(r.submittedAt)}</div>
+          </div>
+          <span class="badge ${r.status.toLowerCase()}">${r.status}</span>
+        </div>
+        <div class="req-meta">
+          <div class="meta-chip"><strong>${r.leaveType}</strong>${hoursStr}</div>
+          <div class="meta-chip">📅 ${dateStr}</div>
+        </div>
+        <div class="req-reason">💬 ${r.reason}</div>
+        <div class="req-handover"><span>Handover:</span> ${r.handover}</div>
+        <div class="req-actions">${actionBtns}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function updateStatus(id, status) {
+    const r = requests.find(r => r.id === id);
+    if (r) { r.status = status; saveData(); renderAdmin(); showToast(status === 'Approved' ? '✅ Leave approved!' : '❌ Leave rejected'); }
+  }
+
+  function filterRequests(filter, el) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    renderAdmin();
+  }
+
+  // Report
+  function populateWeeks() {
+    const sel = document.getElementById('weekSelect');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="all">All Time</option>';
+    const weeks = new Set();
+    requests.forEach(r => {
+      const d = new Date(r.dateFrom + 'T00:00:00');
+      const mon = new Date(d);
+      mon.setDate(d.getDate() - ((d.getDay()+6)%7));
+      weeks.add(mon.toISOString().split('T')[0]);
+    });
+    [...weeks].sort().reverse().forEach(w => {
+      const end = new Date(w+'T00:00:00'); end.setDate(end.getDate()+6);
+      const opt = document.createElement('option');
+      opt.value = w;
+      opt.textContent = `Week: ${fmtDate(w)} – ${fmtDate(end.toISOString().split('T')[0])}`;
+      sel.appendChild(opt);
+    });
+    if (cur) sel.value = cur;
+  }
+
+  function renderReport() {
+    const week = document.getElementById('weekSelect').value;
+    let filtered = requests;
+    if (week !== 'all') {
+      const start = new Date(week+'T00:00:00');
+      const end = new Date(week+'T00:00:00'); end.setDate(end.getDate()+6);
+      filtered = requests.filter(r => { const d = new Date(r.dateFrom+'T00:00:00'); return d >= start && d <= end; });
+    }
+    const body = document.getElementById('reportBody');
+    if (filtered.length === 0) {
+      body.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;">No records for this period</td></tr>`;
+      return;
+    }
+    body.innerHTML = filtered.map(r => {
+      const dateStr = r.dateTo ? `${fmtDate(r.dateFrom)}–${fmtDate(r.dateTo)}` : fmtDate(r.dateFrom);
+      const color = r.status==='Approved'?'var(--accent)':r.status==='Rejected'?'var(--danger)':'var(--warn)';
+      return `<tr>
+        <td style="font-weight:600">${r.name}</td>
+        <td>${r.leaveType}${r.hours?` (${r.hours}h)`:''}</td>
+        <td>${dateStr}</td>
+        <td style="color:${color};font-weight:600">${r.status}</td>
+        <td style="color:var(--muted)">${r.reason}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function exportCSV() {
+    const week = document.getElementById('weekSelect').value;
+    let filtered = requests;
+    if (week !== 'all') {
+      const start = new Date(week+'T00:00:00'), end = new Date(week+'T00:00:00');
+      end.setDate(end.getDate()+6);
+      filtered = requests.filter(r => { const d = new Date(r.dateFrom+'T00:00:00'); return d>=start&&d<=end; });
+    }
+    const rows = [['Name','Leave Type','Hours','Date From','Date To','Reason','Handover','Status','Submitted At']];
+    filtered.forEach(r => rows.push([r.name,r.leaveType,r.hours||'',r.dateFrom,r.dateTo||'',r.reason,r.handover,r.status,r.submittedAt]));
+    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+    a.download = `leave-report-${week==='all'?'all':week}.csv`; a.click();
+    showToast('📊 CSV exported for HR!');
+  }
+
+  function fmtDate(str) {
+    if (!str) return '';
+    return new Date(str+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  }
+  function timeAgo(iso) {
+    const s = (Date.now()-new Date(iso))/1000;
+    if (s<60) return 'just now';
+    if (s<3600) return Math.floor(s/60)+'m ago';
+    if (s<86400) return Math.floor(s/3600)+'h ago';
+    return Math.floor(s/86400)+'d ago';
+  }
+  function showToast(msg) {
+    const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2800);
+  }
+
+  // Init
+  document.getElementById('dateFrom').valueAsDate = new Date();
+
+  // Sample data if empty
+  if (requests.length === 0) {
+    const today = new Date().toISOString().split('T')[0];
+    requests = [
+      {id:1,name:'Ahmad Faizal',leaveType:'Full Day',dateFrom:today,dateTo:'',reason:'Medical appointment',handover:'Covered by Ravi',hours:null,status:'Pending',submittedAt:new Date().toISOString()},
+      {id:2,name:'Siti Nora',leaveType:'Half Day AM',dateFrom:today,dateTo:'',reason:'School event',handover:'No handover needed',hours:null,status:'Approved',submittedAt:new Date(Date.now()-3600000).toISOString()},
+      {id:3,name:'Ravi Kumar',leaveType:'Short Leave',dateFrom:today,dateTo:'',reason:'Bank errand',handover:'Back by 3pm, Faizal to cover',hours:'2',status:'Pending',submittedAt:new Date(Date.now()-7200000).toISOString()},
+    ];
+    saveData();
+  }
+</script>
+</body>
+</html>
