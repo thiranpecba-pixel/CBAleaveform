@@ -515,35 +515,91 @@ select option{background:var(--surface2);}
 
 <script>
 // ════════════════════════════════════
+// ☁️  CLOUD STORAGE — JSONBin.io
+// ════════════════════════════════════
+// HOW TO SET UP (free, 5 minutes):
+//  1. Go to https://jsonbin.io and create a free account
+//  2. Click "Create Bin" and paste this starter JSON, then Save:
+//     {"requests":[],"admins":[{"id":1,"name":"Admin","role":"System Admin","pin":"1234"}],"depts":["Operations","HR","Finance","IT","Sales","Marketing","Management","Other"],"settings":{"annual":14,"medical":14},"period":{"enabled":false,"from":"00:00","to":"06:00"}}
+//  3. Copy the BIN ID from the URL (looks like: 64abc123def456...)
+//  4. Go to API Keys → Create API Key → copy it
+//  5. Paste both below:
+
+const JSONBIN_BIN_ID = '69b1962ac3097a1dd51869da';   
+const JSONBIN_API_KEY = '$2a$10$YNh3GHkIlaDy.iPafk7s2OKPIrbeaBlJhq9qSrs7kRnc7ptFNh.Qm';  
+
+const JSONBIN_URL = `https://api.jsonbin.io/v3/b/69b1962ac3097a1dd51869da`;
+
+// Local cache so the app feels fast
+let _cloudData = null;
+
+async function loadCloudData() {
+  // Try cache first
+  const cached = localStorage.getItem('leaveEasy_cloudCache');
+  if (cached) { try { _cloudData = JSON.parse(cached); } catch(e){} }
+
+  if (!JSONBIN_BIN_ID || JSONBIN_BIN_ID === 'PASTE_YOUR_BIN_ID_HERE') {
+    // No cloud configured — fall back to localStorage only
+    _cloudData = {
+      requests: JSON.parse(localStorage.getItem('leaveEasy_v2') || '[]'),
+      admins: JSON.parse(localStorage.getItem('leaveAdmins') || 'null') || [{ id: 1, name: 'Admin', role: 'System Admin', pin: '1234' }],
+      depts: JSON.parse(localStorage.getItem('leaveDepts') || 'null') || ['Operations','HR','Finance','IT','Sales','Marketing','Management','Other'],
+      settings: JSON.parse(localStorage.getItem('leaveSettings') || '{"annual":14,"medical":14}'),
+      period: JSON.parse(localStorage.getItem('leavePeriod') || '{"enabled":false,"from":"00:00","to":"06:00"}')
+    };
+    return;
+  }
+
+  try {
+    const res = await fetch(JSONBIN_URL + '/latest', {
+      headers: { 'X-Master-Key': JSONBIN_API_KEY }
+    });
+    if (!res.ok) throw new Error('fetch failed');
+    const json = await res.json();
+    _cloudData = json.record;
+    localStorage.setItem('leaveEasy_cloudCache', JSON.stringify(_cloudData));
+  } catch(e) {
+    console.warn('Cloud load failed, using cache:', e);
+    if (!_cloudData) {
+      _cloudData = { requests:[], admins:[{ id:1,name:'Admin',role:'System Admin',pin:'1234' }], depts:['Operations','HR','Finance','IT','Sales','Marketing','Management','Other'], settings:{annual:14,medical:14}, period:{enabled:false,from:'00:00',to:'06:00'} };
+    }
+  }
+}
+
+async function saveCloudData() {
+  if (!_cloudData) return;
+  localStorage.setItem('leaveEasy_cloudCache', JSON.stringify(_cloudData));
+  if (!JSONBIN_BIN_ID || JSONBIN_BIN_ID === 'PASTE_YOUR_BIN_ID_HERE') return;
+  try {
+    await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
+      body: JSON.stringify(_cloudData)
+    });
+  } catch(e) { console.warn('Cloud save failed:', e); }
+}
+
+// ════════════════════════════════════
 // STATE
 // ════════════════════════════════════
-let requests = JSON.parse(localStorage.getItem('leaveEasy_v2') || '[]');
+let requests = [];
 let adminUnlocked = false, pendingPage = null, currentFilter = 'all', selectedLeaveType = '';
 let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
 let currentAdminId = null, selectedAdminForPin = null;
 
-// Default admins (stored in localStorage)
-function getAdmins() {
-  const stored = localStorage.getItem('leaveAdmins');
-  if (stored) return JSON.parse(stored);
-  const defaults = [{ id: 1, name: 'Admin', role: 'System Admin', pin: '1234' }];
-  localStorage.setItem('leaveAdmins', JSON.stringify(defaults));
-  return defaults;
-}
-function saveAdmins(arr) { localStorage.setItem('leaveAdmins', JSON.stringify(arr)); }
+function getAdmins() { return _cloudData ? (_cloudData.admins || []) : [{ id:1, name:'Admin', role:'System Admin', pin:'1234' }]; }
+function saveAdmins(arr) { if (_cloudData) { _cloudData.admins = arr; saveCloudData(); } }
 
-function getDepts() {
-  const stored = localStorage.getItem('leaveDepts');
-  if (stored) return JSON.parse(stored);
-  const defaults = ['Operations','HR','Finance','IT','Sales','Marketing','Management','Other'];
-  localStorage.setItem('leaveDepts', JSON.stringify(defaults));
-  return defaults;
-}
-function saveDepts(arr) { localStorage.setItem('leaveDepts', JSON.stringify(arr)); }
+function getDepts() { return _cloudData ? (_cloudData.depts || []) : ['Operations','HR','Finance','IT','Sales','Marketing','Management','Other']; }
+function saveDepts(arr) { if (_cloudData) { _cloudData.depts = arr; saveCloudData(); } }
 
-function getSettings() { return JSON.parse(localStorage.getItem('leaveSettings') || '{"annual":14,"medical":14}'); }
-function getPeriod() { return JSON.parse(localStorage.getItem('leavePeriod') || '{"enabled":false,"from":"00:00","to":"06:00"}'); }
-function save() { localStorage.setItem('leaveEasy_v2', JSON.stringify(requests)); }
+function getSettings() { return _cloudData ? (_cloudData.settings || {annual:14,medical:14}) : {annual:14,medical:14}; }
+function getPeriod() { return _cloudData ? (_cloudData.period || {enabled:false,from:'00:00',to:'06:00'}) : {enabled:false,from:'00:00',to:'06:00'}; }
+
+function save() {
+  if (_cloudData) { _cloudData.requests = requests; saveCloudData(); }
+  localStorage.setItem('leaveEasy_v2', JSON.stringify(requests)); // keep local backup too
+}
 
 // ════════════════════════════════════
 // PIN / ADMIN SELECT
@@ -695,7 +751,7 @@ function renderPeriodBanner() {
 function togglePeriodEnabled() {
   const p = getPeriod();
   p.enabled = !p.enabled;
-  localStorage.setItem('leavePeriod', JSON.stringify(p));
+  if (_cloudData) { _cloudData.period = p; saveCloudData(); }
   loadPeriodSettings();
   renderPeriodBanner();
 }
@@ -707,7 +763,7 @@ function savePeriod() {
   if (from === to)  { showToast('⚠️ Block-from and block-until cannot be the same time'); return; }
   const p = getPeriod();
   p.from = from; p.to = to; p.enabled = true;
-  localStorage.setItem('leavePeriod', JSON.stringify(p));
+  if (_cloudData) { _cloudData.period = p; saveCloudData(); }
   loadPeriodSettings();
   renderPeriodBanner();
   showToast('✅ Time window saved!');
@@ -1097,7 +1153,7 @@ function removeDept(name) {
 function saveBalanceSettings() {
   const annual=parseInt(document.getElementById('settingAnnual').value)||14;
   const medical=parseInt(document.getElementById('settingMedical').value)||14;
-  localStorage.setItem('leaveSettings', JSON.stringify({annual,medical}));
+  if (_cloudData) { _cloudData.settings = {annual,medical}; saveCloudData(); }
   showToast('✅ Leave allowance saved!');
 }
 function clearAllData() {
@@ -1113,11 +1169,26 @@ function timeAgo(iso) { const s=(Date.now()-new Date(iso))/1000; if(s<60)return'
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
 
 // ════════════════════════════════════
-// INIT — fresh, no sample data
+// INIT — load cloud data then start
 // ════════════════════════════════════
-document.getElementById('dateFrom').valueAsDate = new Date();
-populateDeptDropdown();
-renderPeriodBanner();
+(async function init() {
+  // Show a loading indicator
+  document.body.insertAdjacentHTML('beforeend', `
+    <div id="loadingScreen" style="position:fixed;inset:0;background:#0f1117;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:14px;">
+      <div style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:#4ade80">LeaveEasy</div>
+      <div style="width:36px;height:36px;border:3px solid #2e3347;border-top-color:#4ade80;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+      <div style="font-size:12px;color:#64748b">Loading data…</div>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    </div>`);
+
+  await loadCloudData();
+  requests = (_cloudData && _cloudData.requests) || JSON.parse(localStorage.getItem('leaveEasy_v2') || '[]');
+
+  document.getElementById('loadingScreen').remove();
+  document.getElementById('dateFrom').valueAsDate = new Date();
+  populateDeptDropdown();
+  renderPeriodBanner();
+})();
 </script>
 </body>
 </html>
