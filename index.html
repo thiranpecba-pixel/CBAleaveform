@@ -513,71 +513,119 @@ select option{background:var(--surface2);}
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script type="module">
 // ════════════════════════════════════
-// ☁️  CLOUD STORAGE — JSONBin.io
+// ☁️  CLOUD STORAGE — Firebase Firestore
 // ════════════════════════════════════
-// HOW TO SET UP (free, 5 minutes):
-//  1. Go to https://jsonbin.io and create a free account
-//  2. Click "Create Bin" and paste this starter JSON, then Save:
-//     {"requests":[],"admins":[{"id":1,"name":"Admin","role":"System Admin","pin":"1234"}],"depts":["Operations","HR","Finance","IT","Sales","Marketing","Management","Other"],"settings":{"annual":14,"medical":14},"period":{"enabled":false,"from":"00:00","to":"06:00"}}
-//  3. Copy the BIN ID from the URL (looks like: 64abc123def456...)
-//  4. Go to API Keys → Create API Key → copy it
-//  5. Paste both below:
+// HOW TO SET UP (free, ~10 minutes):
+//
+//  STEP 1 — Create a Firebase project
+//    • Go to https://console.firebase.google.com
+//    • Click "Add project" → give it a name (e.g. "LeaveEasy") → Continue
+//    • Disable Google Analytics (not needed) → Create project
+//
+//  STEP 2 — Create a Firestore database
+//    • In left menu click "Firestore Database" → Create database
+//    • Choose "Start in test mode" → Next → Select your region → Enable
+//
+//  STEP 3 — Register your web app
+//    • Click the gear icon (Project Settings) → scroll to "Your apps"
+//    • Click the </> (Web) icon → give app a nickname → Register app
+//    • Copy the firebaseConfig values shown and paste below
+//
+//  STEP 4 — Set Firestore rules (so only your app can read/write)
+//    • In Firestore → Rules tab → replace with:
+//      rules_version = '2';
+//      service cloud.firestore {
+//        match /databases/{database}/documents {
+//          match /{document=**} { allow read, write: if true; }
+//        }
+//      }
+//    • Publish
+//
+//  STEP 5 — Paste your config values below and deploy!
 
-const JSONBIN_BIN_ID = '69b1962ac3097a1dd51869da';   
-const JSONBIN_API_KEY = '$2a$10$YNh3GHkIlaDy.iPafk7s2OKPIrbeaBlJhq9qSrs7kRnc7ptFNh.Qm';  
+// ▼▼▼ PASTE YOUR FIREBASE CONFIG HERE ▼▼▼
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyD9baMvEDGOHo3n-6QiWlEFoGNhtkfP9Co",
+  authDomain:        "cba-pos-leave-sheet.firebaseapp.com",
+  projectId:         "cba-pos-leave-sheet",
+  storageBucket:     "cba-pos-leave-sheet.firebasestorage.app",
+  messagingSenderId: "100028126145",
+  appId:             "1:100028126145:web:5607f8555de1fb38b05540"
+};
+// ▲▲▲ END OF CONFIG ▲▲▲
 
-const JSONBIN_URL = `https://api.jsonbin.io/v3/b/69b1962ac3097a1dd51869da`;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Local cache so the app feels fast
+let _db = null;
 let _cloudData = null;
+const DOC_PATH = { collection: 'leaveapp', id: 'data' };
+
+const DEFAULTS = {
+  requests: [],
+  admins: [{ id: 1, name: 'Admin', role: 'System Admin', pin: '1234' }],
+  depts: ['Operations','HR','Finance','IT','Sales','Marketing','Management','Other'],
+  settings: { annual: 14, medical: 14 },
+  period: { enabled: false, from: '00:00', to: '06:00' }
+};
+
+function isConfigured() {
+  return FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== 'PASTE_HERE';
+}
 
 async function loadCloudData() {
-  // Try cache first
+  // Load from localStorage cache first for instant display
   const cached = localStorage.getItem('leaveEasy_cloudCache');
   if (cached) { try { _cloudData = JSON.parse(cached); } catch(e){} }
 
-  if (!JSONBIN_BIN_ID || JSONBIN_BIN_ID === 'PASTE_YOUR_BIN_ID_HERE') {
-    // No cloud configured — fall back to localStorage only
+  if (!isConfigured()) {
+    // No Firebase yet — use localStorage fallback
     _cloudData = {
       requests: JSON.parse(localStorage.getItem('leaveEasy_v2') || '[]'),
-      admins: JSON.parse(localStorage.getItem('leaveAdmins') || 'null') || [{ id: 1, name: 'Admin', role: 'System Admin', pin: '1234' }],
-      depts: JSON.parse(localStorage.getItem('leaveDepts') || 'null') || ['Operations','HR','Finance','IT','Sales','Marketing','Management','Other'],
-      settings: JSON.parse(localStorage.getItem('leaveSettings') || '{"annual":14,"medical":14}'),
-      period: JSON.parse(localStorage.getItem('leavePeriod') || '{"enabled":false,"from":"00:00","to":"06:00"}')
+      admins: JSON.parse(localStorage.getItem('leaveAdmins') || 'null') || DEFAULTS.admins,
+      depts: JSON.parse(localStorage.getItem('leaveDepts') || 'null') || DEFAULTS.depts,
+      settings: JSON.parse(localStorage.getItem('leaveSettings') || 'null') || DEFAULTS.settings,
+      period: JSON.parse(localStorage.getItem('leavePeriod') || 'null') || DEFAULTS.period
     };
+    console.warn('⚠️ Firebase not configured — using localStorage only. Data will not sync across devices.');
     return;
   }
 
   try {
-    const res = await fetch(JSONBIN_URL + '/latest', {
-      headers: { 'X-Master-Key': JSONBIN_API_KEY }
-    });
-    if (!res.ok) throw new Error('fetch failed');
-    const json = await res.json();
-    _cloudData = json.record;
+    const app = initializeApp(FIREBASE_CONFIG);
+    _db = getFirestore(app);
+    const ref = doc(_db, DOC_PATH.collection, DOC_PATH.id);
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      _cloudData = snap.data();
+    } else {
+      // First time — initialise the database with defaults
+      _cloudData = { ...DEFAULTS };
+      await setDoc(ref, _cloudData);
+    }
     localStorage.setItem('leaveEasy_cloudCache', JSON.stringify(_cloudData));
   } catch(e) {
-    console.warn('Cloud load failed, using cache:', e);
-    if (!_cloudData) {
-      _cloudData = { requests:[], admins:[{ id:1,name:'Admin',role:'System Admin',pin:'1234' }], depts:['Operations','HR','Finance','IT','Sales','Marketing','Management','Other'], settings:{annual:14,medical:14}, period:{enabled:false,from:'00:00',to:'06:00'} };
-    }
+    console.warn('Firebase load failed, using cache:', e);
+    if (!_cloudData) _cloudData = { ...DEFAULTS };
   }
 }
 
 async function saveCloudData() {
   if (!_cloudData) return;
   localStorage.setItem('leaveEasy_cloudCache', JSON.stringify(_cloudData));
-  if (!JSONBIN_BIN_ID || JSONBIN_BIN_ID === 'PASTE_YOUR_BIN_ID_HERE') return;
+  if (!isConfigured() || !_db) return;
   try {
-    await fetch(JSONBIN_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
-      body: JSON.stringify(_cloudData)
-    });
-  } catch(e) { console.warn('Cloud save failed:', e); }
+    const ref = doc(_db, DOC_PATH.collection, DOC_PATH.id);
+    await setDoc(ref, _cloudData);
+  } catch(e) { console.warn('Firebase save failed:', e); }
 }
+
+// Expose to global scope so non-module functions can use them
+window._getCloudData  = () => _cloudData;
+window._saveCloudData = saveCloudData;
+window._loadCloudData = loadCloudData;
 
 // ════════════════════════════════════
 // STATE
@@ -587,18 +635,21 @@ let adminUnlocked = false, pendingPage = null, currentFilter = 'all', selectedLe
 let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
 let currentAdminId = null, selectedAdminForPin = null;
 
-function getAdmins() { return _cloudData ? (_cloudData.admins || []) : [{ id:1, name:'Admin', role:'System Admin', pin:'1234' }]; }
-function saveAdmins(arr) { if (_cloudData) { _cloudData.admins = arr; saveCloudData(); } }
+function cd() { return window._getCloudData ? window._getCloudData() : null; }
 
-function getDepts() { return _cloudData ? (_cloudData.depts || []) : ['Operations','HR','Finance','IT','Sales','Marketing','Management','Other']; }
-function saveDepts(arr) { if (_cloudData) { _cloudData.depts = arr; saveCloudData(); } }
+function getAdmins() { const d=cd(); return d ? (d.admins||[]) : [{id:1,name:'Admin',role:'System Admin',pin:'1234'}]; }
+function saveAdmins(arr) { const d=cd(); if(d){d.admins=arr; window._saveCloudData();} }
 
-function getSettings() { return _cloudData ? (_cloudData.settings || {annual:14,medical:14}) : {annual:14,medical:14}; }
-function getPeriod() { return _cloudData ? (_cloudData.period || {enabled:false,from:'00:00',to:'06:00'}) : {enabled:false,from:'00:00',to:'06:00'}; }
+function getDepts() { const d=cd(); return d ? (d.depts||[]) : ['Operations','HR','Finance','IT','Sales','Marketing','Management','Other']; }
+function saveDepts(arr) { const d=cd(); if(d){d.depts=arr; window._saveCloudData();} }
+
+function getSettings() { const d=cd(); return d ? (d.settings||{annual:14,medical:14}) : {annual:14,medical:14}; }
+function getPeriod() { const d=cd(); return d ? (d.period||{enabled:false,from:'00:00',to:'06:00'}) : {enabled:false,from:'00:00',to:'06:00'}; }
 
 function save() {
-  if (_cloudData) { _cloudData.requests = requests; saveCloudData(); }
-  localStorage.setItem('leaveEasy_v2', JSON.stringify(requests)); // keep local backup too
+  const d=cd();
+  if(d){ d.requests=requests; window._saveCloudData(); }
+  localStorage.setItem('leaveEasy_v2', JSON.stringify(requests));
 }
 
 // ════════════════════════════════════
@@ -751,7 +802,7 @@ function renderPeriodBanner() {
 function togglePeriodEnabled() {
   const p = getPeriod();
   p.enabled = !p.enabled;
-  if (_cloudData) { _cloudData.period = p; saveCloudData(); }
+  const d=cd(); if(d){ d.period=p; window._saveCloudData(); }
   loadPeriodSettings();
   renderPeriodBanner();
 }
@@ -763,7 +814,7 @@ function savePeriod() {
   if (from === to)  { showToast('⚠️ Block-from and block-until cannot be the same time'); return; }
   const p = getPeriod();
   p.from = from; p.to = to; p.enabled = true;
-  if (_cloudData) { _cloudData.period = p; saveCloudData(); }
+  const d=cd(); if(d){ d.period=p; window._saveCloudData(); }
   loadPeriodSettings();
   renderPeriodBanner();
   showToast('✅ Time window saved!');
@@ -1153,7 +1204,7 @@ function removeDept(name) {
 function saveBalanceSettings() {
   const annual=parseInt(document.getElementById('settingAnnual').value)||14;
   const medical=parseInt(document.getElementById('settingMedical').value)||14;
-  if (_cloudData) { _cloudData.settings = {annual,medical}; saveCloudData(); }
+  const d=cd(); if(d){ d.settings={annual,medical}; window._saveCloudData(); }
   showToast('✅ Leave allowance saved!');
 }
 function clearAllData() {
@@ -1169,20 +1220,26 @@ function timeAgo(iso) { const s=(Date.now()-new Date(iso))/1000; if(s<60)return'
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
 
 // ════════════════════════════════════
-// INIT — load cloud data then start
+// INIT — load Firebase data then start
 // ════════════════════════════════════
 (async function init() {
-  // Show a loading indicator
   document.body.insertAdjacentHTML('beforeend', `
     <div id="loadingScreen" style="position:fixed;inset:0;background:#0f1117;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:14px;">
       <div style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:#4ade80">LeaveEasy</div>
       <div style="width:36px;height:36px;border:3px solid #2e3347;border-top-color:#4ade80;border-radius:50%;animation:spin 0.8s linear infinite"></div>
-      <div style="font-size:12px;color:#64748b">Loading data…</div>
+      <div style="font-size:12px;color:#64748b">Connecting to database…</div>
       <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
     </div>`);
 
-  await loadCloudData();
-  requests = (_cloudData && _cloudData.requests) || JSON.parse(localStorage.getItem('leaveEasy_v2') || '[]');
+  // Wait for the Firebase module to expose its functions
+  let waited = 0;
+  while (!window._loadCloudData && waited < 5000) {
+    await new Promise(r => setTimeout(r, 50)); waited += 50;
+  }
+
+  if (window._loadCloudData) await window._loadCloudData();
+  const d = cd();
+  requests = (d && d.requests) ? d.requests : JSON.parse(localStorage.getItem('leaveEasy_v2') || '[]');
 
   document.getElementById('loadingScreen').remove();
   document.getElementById('dateFrom').valueAsDate = new Date();
