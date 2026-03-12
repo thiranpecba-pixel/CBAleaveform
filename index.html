@@ -14,6 +14,30 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;}
 
+/* LOADING SCREEN */
+#loadingScreen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;}
+#loadingScreen.hidden{display:none;}
+.loader-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--accent);}
+.loader-logo span{color:var(--text);}
+.loader-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loader-text{font-size:13px;color:var(--muted);}
+
+/* SETUP SCREEN */
+#setupScreen{position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:9998;padding:24px;overflow-y:auto;}
+#setupScreen.show{display:flex;}
+.setup-box{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:28px 22px;max-width:440px;width:100%;}
+.setup-box h2{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:6px;}
+.setup-box p{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+.setup-step{background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:12px;border-left:3px solid var(--accent2);}
+.setup-step h4{font-family:'Syne',sans-serif;font-size:12px;color:var(--accent2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;}
+.setup-step p{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:0;}
+.setup-step a{color:var(--accent);text-decoration:none;font-weight:600;}
+.setup-input{width:100%;padding:12px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:10px;}
+.setup-input:focus{border-color:var(--accent);}
+.btn-setup{width:100%;padding:13px;background:var(--accent);color:#0f1117;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;border:none;border-radius:12px;cursor:pointer;margin-top:4px;}
+.setup-error{color:var(--danger);font-size:12px;margin-bottom:10px;display:none;}
+
 /* NAV */
 .nav{display:flex;align-items:center;justify-content:space-between;padding:0 14px;height:56px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;}
 .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--accent);white-space:nowrap;}
@@ -22,6 +46,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .nav-tabs::-webkit-scrollbar{display:none;}
 .nav-tab{padding:6px 11px;border-radius:20px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;background:transparent;color:var(--muted);transition:all 0.2s;white-space:nowrap;}
 .nav-tab.active{background:var(--accent);color:#0f1117;}
+
+/* SAVING INDICATOR */
+.saving-badge{position:fixed;top:62px;right:12px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;color:var(--muted);z-index:300;display:none;align-items:center;gap:6px;}
+.saving-badge.show{display:flex;}
+.saving-badge .saving-dot{width:7px;height:7px;border-radius:50%;background:var(--warn);animation:pulse 1s infinite;}
+.saving-badge.saved .saving-dot{background:var(--accent);animation:none;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
 
 /* PAGES */
 .page{display:none;padding:20px 16px 100px;max-width:560px;margin:0 auto;animation:fadeUp 0.2s ease;}
@@ -83,7 +114,6 @@ select option{background:var(--surface2);}
 .pin-input input{width:50px;height:56px;text-align:center;font-size:22px;font-weight:700;border-radius:12px;padding:0;}
 .pin-error{color:var(--danger);font-size:13px;margin-bottom:10px;display:none;}
 .btn-pin{width:100%;padding:12px;background:var(--accent);color:#0f1117;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;border:none;border-radius:12px;cursor:pointer;}
-.pin-hint{font-size:11px;color:var(--muted);margin-top:10px;}
 
 /* ADMIN SELECT on PIN screen */
 .admin-select-list{margin:0 0 16px;text-align:left;}
@@ -132,7 +162,7 @@ select option{background:var(--surface2);}
 .no-requests{text-align:center;padding:40px 20px;color:var(--muted);}
 .no-requests .big{font-size:36px;margin-bottom:10px;}
 
-/* ── CALENDAR – full expanded view ── */
+/* CALENDAR */
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .cal-nav h2{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;}
 .cal-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
@@ -152,8 +182,6 @@ select option{background:var(--surface2);}
 .cal-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
 .leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
 .leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
-
-/* DAY DETAIL PANEL */
 .day-detail-panel{background:var(--surface);border:1px solid var(--accent);border-radius:var(--radius);padding:14px;margin-bottom:14px;display:none;}
 .day-detail-panel.show{display:block;}
 .ddp-title{font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:var(--accent);margin-bottom:10px;}
@@ -198,16 +226,12 @@ select option{background:var(--surface2);}
 .settings-section h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:13px;color:var(--accent);}
 .btn-save{padding:10px 20px;background:var(--accent);color:#0f1117;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;margin-top:8px;}
 .btn-danger{padding:10px 20px;background:rgba(248,113,113,0.1);color:var(--danger);border:1px solid rgba(248,113,113,0.2);border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;margin-top:8px;}
-
-/* DEPT TAGS */
 .dept-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
 .dept-tag{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;}
 .dept-tag .remove-dept{background:rgba(248,113,113,0.15);border:none;color:var(--danger);width:18px;height:18px;border-radius:4px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;}
 .add-dept-row{display:flex;gap:8px;}
 .add-dept-row input{flex:1;}
 .btn-add{padding:0 16px;background:var(--accent);color:#0f1117;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;}
-
-/* ADMINS LIST */
 .admin-list{margin-bottom:12px;}
 .admin-item{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;}
 .admin-item-info .admin-item-name{font-weight:700;font-size:14px;}
@@ -217,7 +241,7 @@ select option{background:var(--surface2);}
 .add-admin-form{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px;}
 .add-admin-form h4{font-family:'Syne',sans-serif;font-size:12px;color:var(--accent2);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;}
 
-/* LEAVE PERIOD BANNER */
+/* PERIOD */
 .period-banner{border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13px;display:flex;align-items:center;gap:10px;}
 .period-banner.active{background:rgba(74,222,128,0.1);border:1.5px solid var(--accent);}
 .period-banner.inactive{background:rgba(248,113,113,0.08);border:1.5px solid var(--danger);}
@@ -225,24 +249,17 @@ select option{background:var(--surface2);}
 .period-icon{font-size:20px;flex-shrink:0;}
 .period-label{font-weight:700;font-size:13px;}
 .period-dates{font-size:11px;color:var(--muted);margin-top:2px;}
-/* TOGGLE SWITCH */
 .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0 4px;}
 .toggle-switch{width:46px;height:26px;background:var(--border);border-radius:99px;cursor:pointer;position:relative;transition:background 0.25s;flex-shrink:0;}
 .toggle-switch.on{background:var(--accent);}
 .toggle-knob{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.35);}
 .toggle-switch.on .toggle-knob{transform:translateX(20px);}
-/* TIME WINDOW PREVIEW */
 .period-preview{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;}
-/* CLOSED OVERLAY on apply page */
 .closed-overlay{background:var(--surface);border:1.5px solid var(--danger);border-radius:var(--radius);padding:32px 20px;text-align:center;margin-top:14px;}
-/* APPROVED BY chip */
 .approved-by{font-size:11px;color:var(--accent);background:rgba(74,222,128,0.1);border-radius:6px;padding:3px 8px;margin-top:4px;display:inline-block;}
 .rejected-by{font-size:11px;color:var(--danger);background:rgba(248,113,113,0.1);border-radius:6px;padding:3px 8px;margin-top:4px;display:inline-block;}
-/* CLOSED OVERLAY on apply page */
-.closed-overlay{background:var(--surface);border:1.5px solid var(--danger);border-radius:var(--radius);padding:32px 20px;text-align:center;margin-top:14px;}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--surface2);border:1px solid var(--border);border-radius:30px;padding:10px 18px;font-size:13px;z-index:9999;opacity:0;transition:all 0.28s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.4);}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
@@ -250,17 +267,58 @@ select option{background:var(--surface2);}
 </head>
 <body>
 
+<!-- LOADING SCREEN -->
+<div id="loadingScreen">
+  <div class="loader-logo">Leave<span>Easy</span></div>
+  <div class="loader-spinner"></div>
+  <div class="loader-text" id="loadingText">Loading your data…</div>
+</div>
+
+<!-- SETUP SCREEN (shown only first time) -->
+<div id="setupScreen">
+  <div class="setup-box">
+    <div style="font-size:36px;margin-bottom:12px">☁️</div>
+    <h2>Connect Cloud Storage</h2>
+    <p>LeaveEasy uses <strong style="color:var(--accent)">JSONBin.io</strong> (free) to store data in the cloud — so it works on every device and never disappears.</p>
+
+    <div class="setup-step">
+      <h4>Step 1 — Create free account</h4>
+      <p>Go to <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> → Sign Up → Copy your <strong>Secret Key</strong> from the API Keys page.</p>
+    </div>
+    <div class="setup-step">
+      <h4>Step 2 — Create 3 Bins</h4>
+      <p>Click <strong>+ NEW BIN</strong> three times. For each bin, paste <code style="background:var(--surface3);padding:1px 5px;border-radius:4px;color:var(--accent2)">[]</code> as content. Copy each <strong>Bin ID</strong>.</p>
+    </div>
+    <div class="setup-step">
+      <h4>Step 3 — Paste below</h4>
+      <p>Enter your keys here. They are saved only in your browser and never sent anywhere except JSONBin.io.</p>
+    </div>
+
+    <p class="setup-error" id="setupError"></p>
+    <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;display:block;margin-bottom:6px;margin-top:4px">Secret Key (starts with $2b$)</label>
+    <input class="setup-input" id="setupApiKey" type="password" placeholder="$2b$10$xxxxxxxxxxxxxxxxxxxx">
+    <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;display:block;margin-bottom:6px">Bin ID — Leave Requests</label>
+    <input class="setup-input" id="setupBin1" placeholder="e.g. 6642abc1234567890abc1234">
+    <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;display:block;margin-bottom:6px">Bin ID — Admins & Settings</label>
+    <input class="setup-input" id="setupBin2" placeholder="e.g. 6642abc1234567890abc1235">
+    <button class="btn-setup" onclick="saveSetup()">Save & Connect →</button>
+    <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px">⚠️ Set your bins to <strong>Private</strong> in JSONBin.io for security.</p>
+  </div>
+</div>
+
+<!-- SAVING BADGE -->
+<div class="saving-badge" id="savingBadge">
+  <div class="saving-dot" id="savingDot"></div>
+  <span id="savingText">Saving…</span>
+</div>
+
 <!-- PIN OVERLAY -->
 <div class="pin-overlay" id="pinOverlay">
   <div class="pin-box">
     <div style="font-size:32px;margin-bottom:10px">🔐</div>
     <h2>Admin Access</h2>
     <p id="pinPromptText">Select an admin account</p>
-
-    <!-- Step 1: pick admin -->
     <div class="admin-select-list" id="adminSelectList"></div>
-
-    <!-- Step 2: enter PIN -->
     <div id="pinStep" style="display:none">
       <div style="font-size:12px;color:var(--accent2);margin-bottom:14px;font-weight:600" id="selectedAdminLabel"></div>
       <div class="pin-input">
@@ -289,21 +347,11 @@ select option{background:var(--surface2);}
   </div>
 </nav>
 
-<!-- ═══════════ APPLY ═══════════ -->
+<!-- APPLY -->
 <div class="page active" id="page-apply">
   <h1>Apply Leave 🗓️</h1>
   <p class="subtitle">Fill in the details. Your request will be sent to admin for review.</p>
-
   <div id="periodBanner"></div>
-
-  <div class="balance-card">
-    <div class="balance-title">📊 Your Leave Balance</div>
-    <div class="balance-row"><span class="balance-label">Annual Leave</span><span class="balance-days" style="color:var(--accent)" id="balAnnual">— days left</span></div>
-    <div class="bal-bar"><div class="bal-fill" id="barAnnual" style="background:var(--accent);width:0%"></div></div>
-    <div class="balance-row" style="margin-top:10px"><span class="balance-label">Medical Leave</span><span class="balance-days" style="color:var(--accent2)" id="balMedical">— days left</span></div>
-    <div class="bal-bar"><div class="bal-fill" id="barMedical" style="background:var(--accent2);width:0%"></div></div>
-    <p style="font-size:11px;color:var(--muted);margin-top:8px">Enter your name below to see your balance.</p>
-  </div>
 
   <div class="success-box" id="successBox">
     <div class="success-icon">✅</div>
@@ -311,16 +359,9 @@ select option{background:var(--surface2);}
     <p>Your leave request has been sent for approval.<br>You'll be notified once reviewed.</p>
     <button class="btn-new" onclick="resetForm()">+ New Request</button>
   </div>
-
   <div id="applyForm">
-    <div class="form-group">
-      <label>Your Full Name</label>
-      <input type="text" id="empName" placeholder="Enter your full name" autocomplete="name" oninput="updateBalance()">
-    </div>
-    <div class="form-group">
-      <label>Department</label>
-      <select id="empDept"><option value="">— Select Department —</option></select>
-    </div>
+    <div class="form-group"><label>Your Full Name</label><input type="text" id="empName" placeholder="Enter your full name" autocomplete="name"></div>
+    <div class="form-group"><label>Department</label><select id="empDept"><option value="">— Select Department —</option></select></div>
     <div class="form-group">
       <label>Leave Type</label>
       <div class="leave-types">
@@ -344,15 +385,15 @@ select option{background:var(--surface2);}
     </div>
     <div class="form-group"><label>Reason</label><textarea id="reason" placeholder="e.g. Medical appointment, family matter..."></textarea></div>
     <div class="form-group"><label>Handover / Coverage Plan</label><textarea id="handover" placeholder="Who will cover your work? Any tasks to handover?"></textarea></div>
-    <button class="btn-submit" id="submitBtn" onclick="submitLeave()">Submit Request →</button>
+    <button class="btn-submit" onclick="submitLeave()">Submit Request →</button>
   </div>
 </div>
 
-<!-- ═══════════ CALENDAR ═══════════ -->
+<!-- CALENDAR -->
 <div class="page" id="page-calendar">
   <h1>Leave Calendar 📅</h1>
   <p class="subtitle">Full monthly view — tap any date to see details.</p>
-  <div class="cal-nav no-print">
+  <div class="cal-nav">
     <button class="cal-btn" onclick="changeMonth(-1)">‹</button>
     <h2 id="calMonthLabel"></h2>
     <button class="cal-btn" onclick="changeMonth(1)">›</button>
@@ -363,19 +404,16 @@ select option{background:var(--surface2);}
     <div class="leg-item"><div class="leg-dot" style="background:rgba(248,113,113,0.2)"></div>Rejected</div>
   </div>
   <div class="cal-grid">
-    <div class="cal-header-row">
-      <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
-    </div>
+    <div class="cal-header-row"><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div></div>
     <div class="cal-body" id="calBody"></div>
   </div>
-  <!-- Day detail panel shown below calendar -->
   <div class="day-detail-panel" id="dayDetailPanel">
     <div class="ddp-title" id="ddpTitle"></div>
     <div id="ddpRows"></div>
   </div>
 </div>
 
-<!-- ═══════════ ADMIN ═══════════ -->
+<!-- ADMIN -->
 <div class="page" id="page-admin">
   <h1>Admin Panel 🛡️</h1>
   <p class="subtitle" id="adminWelcome">Review leave requests.</p>
@@ -393,7 +431,7 @@ select option{background:var(--surface2);}
   <div id="requestsList"></div>
 </div>
 
-<!-- ═══════════ HISTORY ═══════════ -->
+<!-- HISTORY -->
 <div class="page" id="page-history">
   <h1>Employee History 👤</h1>
   <p class="subtitle">Search an employee to view their full leave record.</p>
@@ -405,15 +443,13 @@ select option{background:var(--surface2);}
   <div id="histList"></div>
 </div>
 
-<!-- ═══════════ REPORT ═══════════ -->
+<!-- REPORT -->
 <div class="page" id="page-report">
   <div class="report-header">
     <div><h1>HR Report 📊</h1><p class="subtitle" style="margin-bottom:0">Weekly leave summary</p></div>
-    <div class="report-btns no-print">
-      <button class="btn-export" onclick="exportCSV()">⬇ CSV</button>
-    </div>
+    <div class="report-btns"><button class="btn-export" onclick="exportCSV()">⬇ CSV</button></div>
   </div>
-  <div class="week-selector no-print">
+  <div class="week-selector">
     <span class="week-label">Period:</span>
     <select id="weekSelect" onchange="renderReport()"><option value="all">All Time</option></select>
   </div>
@@ -425,15 +461,13 @@ select option{background:var(--surface2);}
   </div>
 </div>
 
-<!-- ═══════════ SETTINGS ═══════════ -->
+<!-- SETTINGS -->
 <div class="page" id="page-settings">
   <h1>Settings ⚙️</h1>
   <p class="subtitle">Configure the app for your organisation.</p>
-
-  <!-- ADMINS -->
   <div class="settings-section">
     <h3>👥 Admin Accounts</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:13px">Each admin has their own name and PIN. You must be logged in as an existing admin to make changes.</p>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:13px">Each admin has their own name and PIN.</p>
     <div class="admin-list" id="adminList"></div>
     <div class="add-admin-form">
       <h4>➕ Add New Admin</h4>
@@ -446,215 +480,263 @@ select option{background:var(--surface2);}
       <button class="btn-save" onclick="addAdmin()">Add Admin</button>
     </div>
   </div>
-
-  <!-- DEPARTMENTS -->
   <div class="settings-section">
     <h3>🏢 Departments</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Add or remove department names used in the Apply form.</p>
     <div class="dept-tags" id="deptTags"></div>
     <div class="add-dept-row">
       <input type="text" id="newDeptInput" placeholder="New department name" maxlength="40" onkeydown="if(event.key==='Enter')addDept()">
       <button class="btn-add" onclick="addDept()">Add</button>
     </div>
   </div>
-
-  <!-- LEAVE PERIOD -->
   <div class="settings-section">
     <h3>⏰ Application Time Window</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Set the daily hours when employees <strong style="color:var(--text)">cannot</strong> submit leave requests. Outside these blocked hours, applications are open. Leave both empty to allow anytime.</p>
-
-    <!-- Toggle -->
-    <div class="toggle-row" id="periodToggleRow">
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Set the daily hours when employees <strong style="color:var(--text)">cannot</strong> submit leave requests.</p>
+    <div class="toggle-row">
       <span style="font-size:13px;font-weight:600">Enable blocked hours</span>
-      <div class="toggle-switch" id="periodToggle" onclick="togglePeriodEnabled()">
-        <div class="toggle-knob" id="periodKnob"></div>
-      </div>
+      <div class="toggle-switch" id="periodToggle" onclick="togglePeriodEnabled()"><div class="toggle-knob"></div></div>
     </div>
-
     <div id="periodFields" style="margin-top:14px">
       <div class="two-col">
-        <div class="form-group">
-          <label>Block From</label>
-          <input type="time" id="blockFrom" value="00:00" oninput="updatePeriodPreview()">
-        </div>
-        <div class="form-group">
-          <label>Block Until</label>
-          <input type="time" id="blockTo" value="06:00" oninput="updatePeriodPreview()">
-        </div>
+        <div class="form-group"><label>Block From</label><input type="time" id="blockFrom" value="00:00" oninput="updatePeriodPreview()"></div>
+        <div class="form-group"><label>Block Until</label><input type="time" id="blockTo" value="06:00" oninput="updatePeriodPreview()"></div>
       </div>
       <div class="period-preview" id="periodPreview"></div>
       <button class="btn-save" onclick="savePeriod()">Save Time Window</button>
     </div>
   </div>
-
-  <!-- LEAVE BALANCE -->
   <div class="settings-section">
     <h3>📊 Leave Balance Allowance</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:13px">Default annual allowance per employee.</p>
     <div class="two-col">
       <div class="form-group"><label>Annual Leave (days)</label><input type="number" id="settingAnnual" placeholder="14" min="1" max="60"></div>
       <div class="form-group"><label>Medical Leave (days)</label><input type="number" id="settingMedical" placeholder="14" min="1" max="60"></div>
     </div>
     <button class="btn-save" onclick="saveBalanceSettings()">Save Allowance</button>
   </div>
-
-  <!-- DATA -->
+  <div class="settings-section">
+    <h3>☁️ Cloud Storage</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Change your JSONBin.io credentials.</p>
+    <button class="btn-save" onclick="showSetupScreen()">Update Credentials</button>
+  </div>
   <div class="settings-section">
     <h3>🗑️ Data Management</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Permanently delete all leave request data. Cannot be undone.</p>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Permanently delete all leave request data.</p>
     <button class="btn-danger" onclick="clearAllData()">Clear All Data</button>
   </div>
-
   <div class="settings-section">
     <h3>ℹ️ About</h3>
-    <p style="font-size:13px;color:var(--muted);line-height:1.6">LeaveEasy v3.0 — Mobile-first leave management. Share the URL in your WhatsApp group so employees can apply anytime, anywhere.</p>
+    <p style="font-size:13px;color:var(--muted);line-height:1.6">LeaveEasy v4.0 — Cloud-powered leave management. Data stored securely in JSONBin.io.</p>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script type="module">
-// ════════════════════════════════════
-// ☁️  CLOUD STORAGE — Firebase Firestore
-// ════════════════════════════════════
-// HOW TO SET UP (free, ~10 minutes):
-//
-//  STEP 1 — Create a Firebase project
-//    • Go to https://console.firebase.google.com
-//    • Click "Add project" → give it a name (e.g. "LeaveEasy") → Continue
-//    • Disable Google Analytics (not needed) → Create project
-//
-//  STEP 2 — Create a Firestore database
-//    • In left menu click "Firestore Database" → Create database
-//    • Choose "Start in test mode" → Next → Select your region → Enable
-//
-//  STEP 3 — Register your web app
-//    • Click the gear icon (Project Settings) → scroll to "Your apps"
-//    • Click the </> (Web) icon → give app a nickname → Register app
-//    • Copy the firebaseConfig values shown and paste below
-//
-//  STEP 4 — Set Firestore rules (so only your app can read/write)
-//    • In Firestore → Rules tab → replace with:
-//      rules_version = '2';
-//      service cloud.firestore {
-//        match /databases/{database}/documents {
-//          match /{document=**} { allow read, write: if true; }
-//        }
-//      }
-//    • Publish
-//
-//  STEP 5 — Paste your config values below and deploy!
+<script>
+// ══════════════════════════════════════════════════════
+// JSONBIN CONFIG  — stored in localStorage (browser only)
+// ══════════════════════════════════════════════════════
+const JBIN = 'https://api.jsonbin.io/v3/b';
 
-// ▼▼▼ PASTE YOUR FIREBASE CONFIG HERE ▼▼▼
-const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyD9baMvEDGOHo3n-6QiWlEFoGNhtkfP9Co",
-  authDomain:        "cba-pos-leave-sheet.firebaseapp.com",
-  projectId:         "cba-pos-leave-sheet",
-  storageBucket:     "cba-pos-leave-sheet.firebasestorage.app",
-  messagingSenderId: "100028126145",
-  appId:             "1:100028126145:web:5607f8555de1fb38b05540"
-};
-// ▲▲▲ END OF CONFIG ▲▲▲
+function getCreds() {
+  return {
+    key:    localStorage.getItem('jb_key')   || '',
+    bin1:   localStorage.getItem('jb_bin1')  || '',  // leave requests
+    bin2:   localStorage.getItem('jb_bin2')  || '',  // admins + settings config
+  };
+}
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+// ══════════════════════════════════════════════════════
+// JSONBIN API HELPERS
+// ══════════════════════════════════════════════════════
+async function jbGet(binId) {
+  const { key } = getCreds();
+  const res = await fetch(`${JBIN}/${binId}/latest`, {
+    headers: { 'X-Master-Key': key }
+  });
+  if (!res.ok) throw new Error(`GET failed: ${res.status}`);
+  const data = await res.json();
+  return data.record;
+}
 
-let _db = null;
-let _cloudData = null;
-const DOC_PATH = { collection: 'leaveapp', id: 'data' };
+async function jbSet(binId, record) {
+  const { key } = getCreds();
+  const res = await fetch(`${JBIN}/${binId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': key },
+    body: JSON.stringify(record)
+  });
+  if (!res.ok) throw new Error(`PUT failed: ${res.status}`);
+  return true;
+}
 
-const DEFAULTS = {
-  requests: [],
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+let requests = [];
+let config = {
   admins: [{ id: 1, name: 'Admin', role: 'System Admin', pin: '1234' }],
   depts: ['Operations','HR','Finance','IT','Sales','Marketing','Management','Other'],
   settings: { annual: 14, medical: 14 },
   period: { enabled: false, from: '00:00', to: '06:00' }
 };
+let adminUnlocked = false, pendingPage = null, currentFilter = 'all', selectedLeaveType = '';
+let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
+let currentAdminId = null, selectedAdminForPin = null;
+let saveTimer = null;
 
-function isConfigured() {
-  return FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== 'PASTE_HERE';
+// ══════════════════════════════════════════════════════
+// SAVE — debounced, with badge
+// ══════════════════════════════════════════════════════
+function showSavingBadge(saving) {
+  const badge = document.getElementById('savingBadge');
+  const dot = document.getElementById('savingDot');
+  const txt = document.getElementById('savingText');
+  badge.classList.add('show');
+  if (saving) {
+    badge.classList.remove('saved');
+    dot.style.background = 'var(--warn)';
+    dot.style.animation = 'pulse 1s infinite';
+    txt.textContent = 'Saving…';
+  } else {
+    badge.classList.add('saved');
+    dot.style.background = 'var(--accent)';
+    dot.style.animation = 'none';
+    txt.textContent = 'Saved ✓';
+    setTimeout(() => badge.classList.remove('show'), 2000);
+  }
 }
 
-async function loadCloudData() {
-  // Load from localStorage cache first for instant display
-  const cached = localStorage.getItem('leaveEasy_cloudCache');
-  if (cached) { try { _cloudData = JSON.parse(cached); } catch(e){} }
+async function saveRequests() {
+  const { bin1 } = getCreds();
+  if (!bin1) return;
+  showSavingBadge(true);
+  try {
+    await jbSet(bin1, requests);
+    showSavingBadge(false);
+  } catch(e) {
+    showToast('⚠️ Cloud save failed. Check your connection.');
+    document.getElementById('savingBadge').classList.remove('show');
+  }
+}
 
-  if (!isConfigured()) {
-    // No Firebase yet — use localStorage fallback
-    _cloudData = {
-      requests: JSON.parse(localStorage.getItem('leaveEasy_v2') || '[]'),
-      admins: JSON.parse(localStorage.getItem('leaveAdmins') || 'null') || DEFAULTS.admins,
-      depts: JSON.parse(localStorage.getItem('leaveDepts') || 'null') || DEFAULTS.depts,
-      settings: JSON.parse(localStorage.getItem('leaveSettings') || 'null') || DEFAULTS.settings,
-      period: JSON.parse(localStorage.getItem('leavePeriod') || 'null') || DEFAULTS.period
-    };
-    console.warn('⚠️ Firebase not configured — using localStorage only. Data will not sync across devices.');
+async function saveConfig() {
+  const { bin2 } = getCreds();
+  if (!bin2) return;
+  showSavingBadge(true);
+  try {
+    await jbSet(bin2, config);
+    showSavingBadge(false);
+  } catch(e) {
+    showToast('⚠️ Cloud save failed. Check your connection.');
+    document.getElementById('savingBadge').classList.remove('show');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// SETUP SCREEN
+// ══════════════════════════════════════════════════════
+function showSetupScreen() {
+  document.getElementById('setupScreen').classList.add('show');
+}
+function hideSetupScreen() {
+  document.getElementById('setupScreen').classList.remove('show');
+}
+
+async function saveSetup() {
+  const key  = document.getElementById('setupApiKey').value.trim();
+  const bin1 = document.getElementById('setupBin1').value.trim();
+  const bin2 = document.getElementById('setupBin2').value.trim();
+  const errEl = document.getElementById('setupError');
+  errEl.style.display = 'none';
+
+  if (!key || !bin1 || !bin2) {
+    errEl.textContent = '⚠️ Please fill in all three fields.';
+    errEl.style.display = 'block'; return;
+  }
+
+  // Test connection
+  errEl.textContent = '🔄 Testing connection…';
+  errEl.style.display = 'block';
+  errEl.style.color = 'var(--accent2)';
+
+  try {
+    const testRes = await fetch(`${JBIN}/${bin1}/latest`, { headers: { 'X-Master-Key': key } });
+    if (!testRes.ok) throw new Error(`Status ${testRes.status} — check your Bin ID and Secret Key`);
+    const testData = await testRes.json();
+    // bin1 should be an array (leave requests)
+    if (!Array.isArray(testData.record)) {
+      // Initialize it
+      await fetch(`${JBIN}/${bin1}`, { method:'PUT', headers:{'Content-Type':'application/json','X-Master-Key':key}, body:'[]' });
+    }
+    const testRes2 = await fetch(`${JBIN}/${bin2}/latest`, { headers: { 'X-Master-Key': key } });
+    if (!testRes2.ok) throw new Error(`Bin 2 error: Status ${testRes2.status}`);
+
+    localStorage.setItem('jb_key',  key);
+    localStorage.setItem('jb_bin1', bin1);
+    localStorage.setItem('jb_bin2', bin2);
+
+    errEl.style.display = 'none';
+    hideSetupScreen();
+    await initApp();
+  } catch(e) {
+    errEl.textContent = `❌ ${e.message}`;
+    errEl.style.color = 'var(--danger)';
+    errEl.style.display = 'block';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+async function initApp() {
+  const loadEl = document.getElementById('loadingScreen');
+  const loadTxt = document.getElementById('loadingText');
+  loadEl.classList.remove('hidden');
+
+  const { key, bin1, bin2 } = getCreds();
+  if (!key || !bin1 || !bin2) {
+    loadEl.classList.add('hidden');
+    showSetupScreen();
     return;
   }
 
   try {
-    const app = initializeApp(FIREBASE_CONFIG);
-    _db = getFirestore(app);
-    const ref = doc(_db, DOC_PATH.collection, DOC_PATH.id);
-    const snap = await getDoc(ref);
-    if (snap.exists()) {
-      _cloudData = snap.data();
-    } else {
-      // First time — initialise the database with defaults
-      _cloudData = { ...DEFAULTS };
-      await setDoc(ref, _cloudData);
-    }
-    localStorage.setItem('leaveEasy_cloudCache', JSON.stringify(_cloudData));
+    loadTxt.textContent = 'Loading leave requests…';
+    const r1 = await jbGet(bin1);
+    if (Array.isArray(r1)) requests = r1;
+
+    loadTxt.textContent = 'Loading settings…';
+    const r2 = await jbGet(bin2);
+    if (r2 && typeof r2 === 'object' && r2.admins) config = r2;
+    // Handle old format gracefully
+    if (!config.admins) config.admins = [{ id:1, name:'Admin', role:'System Admin', pin:'1234' }];
+    if (!config.depts) config.depts = ['Operations','HR','Finance','IT','Sales','Marketing','Management','Other'];
+    if (!config.settings) config.settings = { annual:14, medical:14 };
+    if (!config.period) config.period = { enabled:false, from:'00:00', to:'06:00' };
+
+    loadEl.classList.add('hidden');
+    document.getElementById('dateFrom').valueAsDate = new Date();
+    populateDeptDropdown();
+    renderPeriodBanner();
   } catch(e) {
-    console.warn('Firebase load failed, using cache:', e);
-    if (!_cloudData) _cloudData = { ...DEFAULTS };
+    loadTxt.textContent = '❌ Failed to load. Check credentials.';
+    setTimeout(() => {
+      loadEl.classList.add('hidden');
+      showSetupScreen();
+    }, 2000);
   }
 }
 
-async function saveCloudData() {
-  if (!_cloudData) return;
-  localStorage.setItem('leaveEasy_cloudCache', JSON.stringify(_cloudData));
-  if (!isConfigured() || !_db) return;
-  try {
-    const ref = doc(_db, DOC_PATH.collection, DOC_PATH.id);
-    await setDoc(ref, _cloudData);
-  } catch(e) { console.warn('Firebase save failed:', e); }
-}
+// ══════════════════════════════════════════════════════
+// DATA ACCESSORS (now use config object instead of localStorage)
+// ══════════════════════════════════════════════════════
+function getAdmins()   { return config.admins || []; }
+function getDepts()    { return config.depts  || []; }
+function getSettings() { return config.settings || { annual:14, medical:14 }; }
+function getPeriod()   { return config.period   || { enabled:false, from:'00:00', to:'06:00' }; }
 
-// Expose to global scope so non-module functions can use them
-window._getCloudData  = () => _cloudData;
-window._saveCloudData = saveCloudData;
-window._loadCloudData = loadCloudData;
-
-// ════════════════════════════════════
-// STATE
-// ════════════════════════════════════
-let requests = [];
-let adminUnlocked = false, pendingPage = null, currentFilter = 'all', selectedLeaveType = '';
-let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
-let currentAdminId = null, selectedAdminForPin = null;
-
-function cd() { return window._getCloudData ? window._getCloudData() : null; }
-
-function getAdmins() { const d=cd(); return d ? (d.admins||[]) : [{id:1,name:'Admin',role:'System Admin',pin:'1234'}]; }
-function saveAdmins(arr) { const d=cd(); if(d){d.admins=arr; window._saveCloudData();} }
-
-function getDepts() { const d=cd(); return d ? (d.depts||[]) : ['Operations','HR','Finance','IT','Sales','Marketing','Management','Other']; }
-function saveDepts(arr) { const d=cd(); if(d){d.depts=arr; window._saveCloudData();} }
-
-function getSettings() { const d=cd(); return d ? (d.settings||{annual:14,medical:14}) : {annual:14,medical:14}; }
-function getPeriod() { const d=cd(); return d ? (d.period||{enabled:false,from:'00:00',to:'06:00'}) : {enabled:false,from:'00:00',to:'06:00'}; }
-
-function save() {
-  const d=cd();
-  if(d){ d.requests=requests; window._saveCloudData(); }
-  localStorage.setItem('leaveEasy_v2', JSON.stringify(requests));
-}
-
-// ════════════════════════════════════
+// ══════════════════════════════════════════════════════
 // PIN / ADMIN SELECT
-// ════════════════════════════════════
+// ══════════════════════════════════════════════════════
 function buildAdminSelectList() {
   const admins = getAdmins();
   const list = document.getElementById('adminSelectList');
@@ -663,11 +745,10 @@ function buildAdminSelectList() {
       <div style="font-size:26px">👤</div>
       <div><div class="asi-name">${a.name}</div><div class="asi-role">${a.role}</div></div>
     </div>`).join('');
-  document.getElementById('adminSelectList').style.display = 'block';
+  list.style.display = 'block';
   document.getElementById('pinStep').style.display = 'none';
   document.getElementById('pinPromptText').textContent = 'Select an admin account';
 }
-
 function pickAdmin(id) {
   selectedAdminForPin = id;
   const admin = getAdmins().find(a => a.id === id);
@@ -676,40 +757,35 @@ function pickAdmin(id) {
   document.getElementById('pinStep').style.display = 'block';
   document.getElementById('pinPromptText').textContent = 'Enter your 4-digit PIN';
   document.getElementById('pinError').style.display = 'none';
-  ['p1','p2','p3','p4'].forEach(id=>document.getElementById(id).value='');
+  ['p1','p2','p3','p4'].forEach(i=>document.getElementById(i).value='');
   setTimeout(()=>document.getElementById('p1').focus(),100);
 }
+function backToAdminSelect() { selectedAdminForPin=null; buildAdminSelectList(); }
 
-function backToAdminSelect() {
-  selectedAdminForPin = null;
-  buildAdminSelectList();
-}
-
-document.querySelectorAll('.pin-input input').forEach((inp, i, arr) => {
-  inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g,''); if (inp.value && i < arr.length-1) arr[i+1].focus(); });
-  inp.addEventListener('keydown', e => { if (e.key==='Backspace' && !inp.value && i>0) arr[i-1].focus(); if (e.key==='Enter') checkPin(); });
+document.querySelectorAll('.pin-input input').forEach((inp,i,arr) => {
+  inp.addEventListener('input', () => { inp.value=inp.value.replace(/\D/g,''); if(inp.value&&i<arr.length-1)arr[i+1].focus(); });
+  inp.addEventListener('keydown', e => { if(e.key==='Backspace'&&!inp.value&&i>0)arr[i-1].focus(); if(e.key==='Enter')checkPin(); });
 });
 
 function checkPin() {
-  const pin = ['p1','p2','p3','p4'].map(id=>document.getElementById(id).value).join('');
+  const pin = ['p1','p2','p3','p4'].map(i=>document.getElementById(i).value).join('');
   const admin = getAdmins().find(a => a.id === selectedAdminForPin);
   if (admin && pin === admin.pin) {
-    adminUnlocked = true;
-    currentAdminId = admin.id;
+    adminUnlocked = true; currentAdminId = admin.id;
     document.getElementById('pinOverlay').classList.remove('show');
     document.getElementById('pinError').style.display = 'none';
-    ['p1','p2','p3','p4'].forEach(id=>document.getElementById(id).value='');
-    if (pendingPage) { activatePage(pendingPage); pendingPage = null; }
+    ['p1','p2','p3','p4'].forEach(i=>document.getElementById(i).value='');
+    if (pendingPage) { activatePage(pendingPage); pendingPage=null; }
   } else {
     document.getElementById('pinError').style.display = 'block';
-    ['p1','p2','p3','p4'].forEach(id=>document.getElementById(id).value='');
+    ['p1','p2','p3','p4'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('p1').focus();
   }
 }
 
-// ════════════════════════════════════
+// ══════════════════════════════════════════════════════
 // NAVIGATION
-// ════════════════════════════════════
+// ══════════════════════════════════════════════════════
 function activatePage(id) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
@@ -731,521 +807,279 @@ function showPage(id, requirePin) {
   activatePage(id);
 }
 
-// ════════════════════════════════════
+// ══════════════════════════════════════════════════════
 // DEPARTMENT DROPDOWN
-// ════════════════════════════════════
+// ══════════════════════════════════════════════════════
 function populateDeptDropdown() {
   const sel = document.getElementById('empDept');
-  const depts = getDepts();
-  sel.innerHTML = '<option value="">— Select Department —</option>' + depts.map(d=>`<option>${d}</option>`).join('');
+  sel.innerHTML = '<option value="">— Select Department —</option>' + getDepts().map(d=>`<option>${d}</option>`).join('');
 }
 
-// ════════════════════════════════════
-// APPLICATION TIME WINDOW
-// ════════════════════════════════════
+// ══════════════════════════════════════════════════════
+// TIME WINDOW
+// ══════════════════════════════════════════════════════
 function fmt12(t) {
   if (!t) return '';
   const [h,m] = t.split(':').map(Number);
-  const ampm = h < 12 ? 'AM' : 'PM';
-  const hh = h % 12 || 12;
-  return `${hh}:${String(m).padStart(2,'0')} ${ampm}`;
+  return `${h%12||12}:${String(m).padStart(2,'0')} ${h<12?'AM':'PM'}`;
 }
-
 function isPeriodOpen() {
   const p = getPeriod();
   if (!p.enabled) return true;
-  const now = new Date();
-  const cur = now.getHours() * 60 + now.getMinutes();
-  const [fh,fm] = p.from.split(':').map(Number);
-  const [th,tm] = p.to.split(':').map(Number);
-  const bFrom = fh*60+fm, bTo = th*60+tm;
-  // blocked if current time is inside the blocked window (handles overnight wrap)
-  if (bFrom < bTo) return !(cur >= bFrom && cur < bTo);
-  else return !(cur >= bFrom || cur < bTo); // overnight e.g. 22:00–06:00
+  const now = new Date(), cur = now.getHours()*60+now.getMinutes();
+  const [fh,fm]=p.from.split(':').map(Number), [th,tm]=p.to.split(':').map(Number);
+  const bFrom=fh*60+fm, bTo=th*60+tm;
+  if (bFrom<bTo) return !(cur>=bFrom&&cur<bTo);
+  else return !(cur>=bFrom||cur<bTo);
 }
-
 function renderPeriodBanner() {
-  const p = getPeriod();
-  const bannerEl  = document.getElementById('periodBanner');
-  const formEl    = document.getElementById('applyForm');
-  const successEl = document.getElementById('successBox');
+  const p = getPeriod(), bannerEl=document.getElementById('periodBanner'), formEl=document.getElementById('applyForm');
   if (!bannerEl) return;
   const open = isPeriodOpen();
-  // clear old closed block
-  const old = document.getElementById('closedBlock'); if (old) old.remove();
-
+  const old=document.getElementById('closedBlock'); if(old)old.remove();
   if (!p.enabled) {
-    bannerEl.innerHTML = `<div class="period-banner noperiod"><div class="period-icon">📋</div><div><div class="period-label">Applications Open</div><div class="period-dates">No time restriction — apply anytime</div></div></div>`;
-    if (formEl) formEl.style.display = 'block';
-    return;
+    bannerEl.innerHTML=`<div class="period-banner noperiod"><div class="period-icon">📋</div><div><div class="period-label">Applications Open</div><div class="period-dates">No time restriction — apply anytime</div></div></div>`;
+    if(formEl)formEl.style.display='block'; return;
   }
-
   if (open) {
-    bannerEl.innerHTML = `<div class="period-banner active"><div class="period-icon">🟢</div><div><div class="period-label">Applications Open Now</div><div class="period-dates">Blocked daily: ${fmt12(p.from)} – ${fmt12(p.to)}</div></div></div>`;
-    if (formEl) formEl.style.display = 'block';
+    bannerEl.innerHTML=`<div class="period-banner active"><div class="period-icon">🟢</div><div><div class="period-label">Applications Open Now</div><div class="period-dates">Blocked daily: ${fmt12(p.from)} – ${fmt12(p.to)}</div></div></div>`;
+    if(formEl)formEl.style.display='block';
   } else {
-    bannerEl.innerHTML = `<div class="period-banner inactive"><div class="period-icon">🔴</div><div><div class="period-label">Applications Closed</div><div class="period-dates">Blocked window: ${fmt12(p.from)} – ${fmt12(p.to)}<br>Please try again after ${fmt12(p.to)}.</div></div></div>`;
-    if (formEl) formEl.style.display = 'none';
-    if (successEl) successEl.classList.remove('visible');
-    const cb = document.createElement('div');
-    cb.id = 'closedBlock'; cb.className = 'closed-overlay';
-    cb.innerHTML = `<div style="font-size:44px;margin-bottom:12px">🚫</div>
-      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;margin-bottom:8px">Applications Closed</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.8">
-        Blocked window: <strong style="color:var(--danger)">${fmt12(p.from)} – ${fmt12(p.to)}</strong><br>
-        Please try again after <strong>${fmt12(p.to)}</strong>.
-      </div>`;
+    bannerEl.innerHTML=`<div class="period-banner inactive"><div class="period-icon">🔴</div><div><div class="period-label">Applications Closed</div><div class="period-dates">Blocked: ${fmt12(p.from)} – ${fmt12(p.to)}</div></div></div>`;
+    if(formEl)formEl.style.display='none';
+    const cb=document.createElement('div'); cb.id='closedBlock'; cb.className='closed-overlay';
+    cb.innerHTML=`<div style="font-size:44px;margin-bottom:12px">🚫</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;margin-bottom:8px">Applications Closed</div><div style="font-size:13px;color:var(--muted);line-height:1.8">Blocked: <strong style="color:var(--danger)">${fmt12(p.from)} – ${fmt12(p.to)}</strong><br>Please try again after <strong>${fmt12(p.to)}</strong>.</div>`;
     formEl.parentNode.insertBefore(cb, formEl.nextSibling);
   }
 }
-
 function togglePeriodEnabled() {
-  const p = getPeriod();
-  p.enabled = !p.enabled;
-  const d=cd(); if(d){ d.period=p; window._saveCloudData(); }
-  loadPeriodSettings();
-  renderPeriodBanner();
+  config.period.enabled = !config.period.enabled;
+  loadPeriodSettings(); renderPeriodBanner();
+  saveConfig();
 }
-
 function savePeriod() {
-  const from = document.getElementById('blockFrom').value;
-  const to   = document.getElementById('blockTo').value;
-  if (!from || !to) { showToast('⚠️ Set both times'); return; }
-  if (from === to)  { showToast('⚠️ Block-from and block-until cannot be the same time'); return; }
-  const p = getPeriod();
-  p.from = from; p.to = to; p.enabled = true;
-  const d=cd(); if(d){ d.period=p; window._saveCloudData(); }
-  loadPeriodSettings();
-  renderPeriodBanner();
-  showToast('✅ Time window saved!');
+  const from=document.getElementById('blockFrom').value, to=document.getElementById('blockTo').value;
+  if(!from||!to){showToast('⚠️ Set both times');return;}
+  if(from===to){showToast('⚠️ Cannot be the same time');return;}
+  config.period.from=from; config.period.to=to; config.period.enabled=true;
+  loadPeriodSettings(); renderPeriodBanner(); saveConfig(); showToast('✅ Time window saved!');
 }
-
 function loadPeriodSettings() {
-  const p = getPeriod();
-  const toggle = document.getElementById('periodToggle');
-  const fields  = document.getElementById('periodFields');
-  if (toggle) toggle.classList.toggle('on', !!p.enabled);
-  if (fields)  fields.style.display = p.enabled ? 'block' : 'none';
-  const bf = document.getElementById('blockFrom');
-  const bt = document.getElementById('blockTo');
-  if (bf) bf.value = p.from || '00:00';
-  if (bt) bt.value = p.to   || '06:00';
+  const p=getPeriod(), toggle=document.getElementById('periodToggle'), fields=document.getElementById('periodFields');
+  if(toggle)toggle.classList.toggle('on',!!p.enabled);
+  if(fields)fields.style.display=p.enabled?'block':'none';
+  const bf=document.getElementById('blockFrom'), bt=document.getElementById('blockTo');
+  if(bf)bf.value=p.from||'00:00'; if(bt)bt.value=p.to||'06:00';
   updatePeriodPreview();
 }
-
 function updatePeriodPreview() {
-  const fromEl = document.getElementById('blockFrom');
-  const toEl   = document.getElementById('blockTo');
-  const preEl  = document.getElementById('periodPreview');
-  if (!fromEl || !toEl || !preEl) return;
-  const from = fromEl.value || '00:00';
-  const to   = toEl.value   || '06:00';
-  const [fh,fm] = from.split(':').map(Number);
-  const [th,tm] = to.split(':').map(Number);
-  const fMin = fh*60+fm, tMin = th*60+tm;
-  const total = 1440;
-  // build segments: open (green) + blocked (red)
-  let segs = '';
-  if (fMin < tMin) {
-    // open: 0→fMin, blocked: fMin→tMin, open: tMin→1440
-    const o1 = (fMin/total*100).toFixed(2);
-    const bl = ((tMin-fMin)/total*100).toFixed(2);
-    const o2 = ((total-tMin)/total*100).toFixed(2);
-    if (parseFloat(o1)>0) segs += `<div style="width:${o1}%;background:rgba(74,222,128,0.45);height:100%;border-radius:3px 0 0 3px"></div>`;
-    segs += `<div style="width:${bl}%;background:rgba(248,113,113,0.65);height:100%"></div>`;
-    if (parseFloat(o2)>0) segs += `<div style="width:${o2}%;background:rgba(74,222,128,0.45);height:100%;border-radius:0 3px 3px 0"></div>`;
-  } else {
-    // overnight: blocked: 0→tMin, open: tMin→fMin, blocked: fMin→1440
-    const bl1 = (tMin/total*100).toFixed(2);
-    const op  = ((fMin-tMin)/total*100).toFixed(2);
-    const bl2 = ((total-fMin)/total*100).toFixed(2);
-    if (parseFloat(bl1)>0) segs += `<div style="width:${bl1}%;background:rgba(248,113,113,0.65);height:100%;border-radius:3px 0 0 3px"></div>`;
-    segs += `<div style="width:${op}%;background:rgba(74,222,128,0.45);height:100%"></div>`;
-    if (parseFloat(bl2)>0) segs += `<div style="width:${bl2}%;background:rgba(248,113,113,0.65);height:100%;border-radius:0 3px 3px 0"></div>`;
-  }
-  const blockMins = fMin < tMin ? tMin-fMin : (total-fMin)+tMin;
-  const openMins  = total - blockMins;
-  const fmtMins = m => m>=60 ? `${Math.floor(m/60)}h ${m%60>0?m%60+'m':''}`.trim() : `${m}m`;
-  preEl.innerHTML = `
-    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">24-hour preview</div>
-    <div style="display:flex;height:12px;border-radius:4px;overflow:hidden;gap:1px;margin-bottom:8px">${segs}</div>
-    <div style="display:flex;gap:4px;font-size:10px;color:var(--muted);margin-bottom:6px">
-      <span>12 AM</span><span style="margin-left:auto">12 PM</span><span style="margin-left:auto">11 PM</span>
-    </div>
-    <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px">
-      <span>🔴 Blocked: <strong style="color:var(--danger)">${fmt12(from)} – ${fmt12(to)}</strong> (${fmtMins(blockMins)})</span>
-      <span>🟢 Open: <strong style="color:var(--accent)">${fmtMins(openMins)}</strong> / day</span>
-    </div>`;
+  const fromEl=document.getElementById('blockFrom'), toEl=document.getElementById('blockTo'), preEl=document.getElementById('periodPreview');
+  if(!fromEl||!toEl||!preEl)return;
+  const from=fromEl.value||'00:00', to=toEl.value||'06:00';
+  const [fh,fm]=from.split(':').map(Number),[th,tm]=to.split(':').map(Number);
+  const fMin=fh*60+fm, tMin=th*60+tm, total=1440;
+  let segs='';
+  if(fMin<tMin){const o1=(fMin/total*100).toFixed(2),bl=((tMin-fMin)/total*100).toFixed(2),o2=((total-tMin)/total*100).toFixed(2);if(parseFloat(o1)>0)segs+=`<div style="width:${o1}%;background:rgba(74,222,128,0.45);height:100%;border-radius:3px 0 0 3px"></div>`;segs+=`<div style="width:${bl}%;background:rgba(248,113,113,0.65);height:100%"></div>`;if(parseFloat(o2)>0)segs+=`<div style="width:${o2}%;background:rgba(74,222,128,0.45);height:100%;border-radius:0 3px 3px 0"></div>`;}else{const bl1=(tMin/total*100).toFixed(2),op=((fMin-tMin)/total*100).toFixed(2),bl2=((total-fMin)/total*100).toFixed(2);if(parseFloat(bl1)>0)segs+=`<div style="width:${bl1}%;background:rgba(248,113,113,0.65);height:100%;border-radius:3px 0 0 3px"></div>`;segs+=`<div style="width:${op}%;background:rgba(74,222,128,0.45);height:100%"></div>`;if(parseFloat(bl2)>0)segs+=`<div style="width:${bl2}%;background:rgba(248,113,113,0.65);height:100%;border-radius:0 3px 3px 0"></div>`;}
+  const blockMins=fMin<tMin?tMin-fMin:(total-fMin)+tMin, openMins=total-blockMins;
+  const fmtMins=m=>m>=60?`${Math.floor(m/60)}h ${m%60>0?m%60+'m':''}`.trim():`${m}m`;
+  preEl.innerHTML=`<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">24-hour preview</div><div style="display:flex;height:12px;border-radius:4px;overflow:hidden;gap:1px;margin-bottom:8px">${segs}</div><div style="display:flex;gap:4px;font-size:10px;color:var(--muted);margin-bottom:6px"><span>12 AM</span><span style="margin-left:auto">12 PM</span><span style="margin-left:auto">11 PM</span></div><div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px"><span>🔴 Blocked: <strong style="color:var(--danger)">${fmt12(from)} – ${fmt12(to)}</strong> (${fmtMins(blockMins)})</span><span>🟢 Open: <strong style="color:var(--accent)">${fmtMins(openMins)}</strong> / day</span></div>`;
 }
 
 
-function updateBalance() {
-  const name = document.getElementById('empName').value.trim().toLowerCase();
-  if (!name) return;
-  const s = getSettings();
-  const approved = requests.filter(r=>r.name.toLowerCase()===name && r.status==='Approved');
-  const annualUsed = approved.filter(r=>r.leaveType==='Full Day').length + approved.filter(r=>r.leaveType.startsWith('Half Day')).length*0.5;
-  const medUsed = approved.filter(r=>r.leaveType==='Medical').length;
-  const annLeft = Math.max(0, s.annual - annualUsed), medLeft = Math.max(0, s.medical - medUsed);
-  document.getElementById('balAnnual').textContent = annLeft + ' days left';
-  document.getElementById('balMedical').textContent = medLeft + ' days left';
-  document.getElementById('barAnnual').style.width = Math.round(annLeft/s.annual*100)+'%';
-  document.getElementById('barMedical').style.width = Math.round(medLeft/s.medical*100)+'%';
-}
 
-// ════════════════════════════════════
+// ══════════════════════════════════════════════════════
 // APPLY
-// ════════════════════════════════════
-function selectLeave(el, type) {
-  document.querySelectorAll('.leave-card').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected'); selectedLeaveType = type;
-  document.getElementById('hoursRow').classList.toggle('visible', type==='Short Leave');
-}
-function submitLeave() {
-  if (!isPeriodOpen()) { showToast('⛔ Leave applications are currently closed'); return; }
-  const name=document.getElementById('empName').value.trim(), dept=document.getElementById('empDept').value;
-  const dateFrom=document.getElementById('dateFrom').value, dateTo=document.getElementById('dateTo').value;
-  const reason=document.getElementById('reason').value.trim(), handover=document.getElementById('handover').value.trim();
-  if (!name) { showToast('⚠️ Please enter your name'); return; }
-  if (!dept) { showToast('⚠️ Please select your department'); return; }
-  if (!selectedLeaveType) { showToast('⚠️ Please select leave type'); return; }
-  if (!dateFrom) { showToast('⚠️ Please select a date'); return; }
-  if (!reason) { showToast('⚠️ Please enter a reason'); return; }
-  if (!handover) { showToast('⚠️ Please fill in handover details'); return; }
-  const hours = selectedLeaveType==='Short Leave' ? document.getElementById('hoursNeeded').value : null;
-  requests.unshift({ id:Date.now(), name, dept, leaveType:selectedLeaveType, dateFrom, dateTo, reason, handover, hours, status:'Pending', submittedAt:new Date().toISOString() });
-  save();
+// ══════════════════════════════════════════════════════
+function selectLeave(el,type){document.querySelectorAll('.leave-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');selectedLeaveType=type;document.getElementById('hoursRow').classList.toggle('visible',type==='Short Leave');}
+
+async function submitLeave() {
+  if(!isPeriodOpen()){showToast('⛔ Leave applications are currently closed');return;}
+  const name=document.getElementById('empName').value.trim(),dept=document.getElementById('empDept').value;
+  const dateFrom=document.getElementById('dateFrom').value,dateTo=document.getElementById('dateTo').value;
+  const reason=document.getElementById('reason').value.trim(),handover=document.getElementById('handover').value.trim();
+  if(!name){showToast('⚠️ Please enter your name');return;}
+  if(!dept){showToast('⚠️ Please select your department');return;}
+  if(!selectedLeaveType){showToast('⚠️ Please select leave type');return;}
+  if(!dateFrom){showToast('⚠️ Please select a date');return;}
+  if(!reason){showToast('⚠️ Please enter a reason');return;}
+  if(!handover){showToast('⚠️ Please fill in handover details');return;}
+  const hours=selectedLeaveType==='Short Leave'?document.getElementById('hoursNeeded').value:null;
+  requests.unshift({id:Date.now(),name,dept,leaveType:selectedLeaveType,dateFrom,dateTo,reason,handover,hours,status:'Pending',submittedAt:new Date().toISOString()});
   document.getElementById('successBox').classList.add('visible');
-  document.getElementById('applyForm').style.display = 'none';
+  document.getElementById('applyForm').style.display='none';
+  await saveRequests();
 }
-function resetForm() {
-  document.getElementById('successBox').classList.remove('visible');
-  document.getElementById('applyForm').style.display = 'block';
+function resetForm(){
+  document.getElementById('successBox').classList.remove('visible');document.getElementById('applyForm').style.display='block';
   ['empName','dateTo','reason','handover'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('empDept').value = '';
-  document.getElementById('dateFrom').valueAsDate = new Date();
+  document.getElementById('empDept').value='';document.getElementById('dateFrom').valueAsDate=new Date();
   document.querySelectorAll('.leave-card').forEach(c=>c.classList.remove('selected'));
-  selectedLeaveType=''; document.getElementById('hoursRow').classList.remove('visible');
+  selectedLeaveType='';document.getElementById('hoursRow').classList.remove('visible');
 }
 
-// ════════════════════════════════════
+// ══════════════════════════════════════════════════════
 // ADMIN
-// ════════════════════════════════════
+// ══════════════════════════════════════════════════════
 function renderAdmin() {
-  const admin = getAdmins().find(a=>a.id===currentAdminId);
-  if (admin) document.getElementById('adminWelcome').textContent = `Logged in as ${admin.name} · ${admin.role}`;
-  document.getElementById('statPending').textContent = requests.filter(r=>r.status==='Pending').length;
-  document.getElementById('statApproved').textContent = requests.filter(r=>r.status==='Approved').length;
-  document.getElementById('statTotal').textContent = requests.length;
-  const filtered = currentFilter==='all' ? requests : requests.filter(r=>r.status===currentFilter);
-  const container = document.getElementById('requestsList');
-  if (!filtered.length) { container.innerHTML=`<div class="no-requests"><div class="big">📭</div><p>No ${currentFilter==='all'?'':currentFilter.toLowerCase()+' '}requests found</p></div>`; return; }
-  container.innerHTML = filtered.map(r => {
-    const ds = r.dateTo && r.dateTo!==r.dateFrom ? `${fmtDate(r.dateFrom)} → ${fmtDate(r.dateTo)}` : fmtDate(r.dateFrom);
-    const waMsg = encodeURIComponent(`Hi ${r.name},\n\nYour *${r.leaveType}* request for *${ds}* has been *${r.status}* ${r.status==='Approved'?'✅':'❌'}.\n\nThank you.\nAdmin`);
-    const actionBtns = r.status==='Pending'
-      ? `<button class="btn-approve" onclick="updateStatus(${r.id},'Approved')">✅ Approve</button><button class="btn-reject" onclick="updateStatus(${r.id},'Rejected')">❌ Reject</button><a href="https://wa.me/?text=${waMsg}" target="_blank"><button class="btn-wa">💬</button></a>`
-      : `<a href="https://wa.me/?text=${waMsg}" target="_blank" style="flex:1"><button class="btn-wa" style="width:100%;border-radius:9px;padding:9px;border:none;background:rgba(37,211,102,0.1);color:#25d366;font-family:DM Sans,sans-serif;font-weight:600;font-size:12px;cursor:pointer">💬 Notify via WhatsApp</button></a>`;
-    const actionedLine = r.approvedBy
-      ? `<div class="approved-by">✅ Approved by <strong>${r.approvedBy}</strong>${r.approvedAt ? ' · '+timeAgo(r.approvedAt) : ''}</div>`
-      : r.rejectedBy
-      ? `<div class="rejected-by">❌ Rejected by <strong>${r.rejectedBy}</strong>${r.rejectedAt ? ' · '+timeAgo(r.rejectedAt) : ''}</div>`
-      : '';
-    return `<div class="request-card">
-      <div class="req-header">
-        <div><div class="req-name">${r.name}</div>${r.dept?`<div class="req-dept">${r.dept}</div>`:''}<div class="req-date">Submitted ${timeAgo(r.submittedAt)}</div></div>
-        <span class="badge ${r.status.toLowerCase()}">${r.status}</span>
-      </div>
-      <div class="req-meta"><div class="meta-chip"><strong>${r.leaveType}</strong>${r.hours?` (${r.hours}h)`:''}</div><div class="meta-chip">📅 ${ds}</div></div>
-      <div class="req-reason">💬 ${r.reason}</div>
-      <div class="req-handover"><span>Handover:</span> ${r.handover}</div>
-      ${actionedLine}
-      <div class="req-actions" style="margin-top:10px">${actionBtns}</div>
-    </div>`;
+  const admin=getAdmins().find(a=>a.id===currentAdminId);
+  if(admin)document.getElementById('adminWelcome').textContent=`Logged in as ${admin.name} · ${admin.role}`;
+  document.getElementById('statPending').textContent=requests.filter(r=>r.status==='Pending').length;
+  document.getElementById('statApproved').textContent=requests.filter(r=>r.status==='Approved').length;
+  document.getElementById('statTotal').textContent=requests.length;
+  const filtered=currentFilter==='all'?requests:requests.filter(r=>r.status===currentFilter);
+  const container=document.getElementById('requestsList');
+  if(!filtered.length){container.innerHTML=`<div class="no-requests"><div class="big">📭</div><p>No ${currentFilter==='all'?'':currentFilter.toLowerCase()+' '}requests found</p></div>`;return;}
+  container.innerHTML=filtered.map(r=>{
+    const ds=r.dateTo&&r.dateTo!==r.dateFrom?`${fmtDate(r.dateFrom)} → ${fmtDate(r.dateTo)}`:fmtDate(r.dateFrom);
+    const waMsg=encodeURIComponent(`Hi ${r.name},\n\nYour *${r.leaveType}* request for *${ds}* has been *${r.status}* ${r.status==='Approved'?'✅':'❌'}.\n\nThank you.\nAdmin`);
+    const actionBtns=r.status==='Pending'
+      ?`<button class="btn-approve" onclick="updateStatus(${r.id},'Approved')">✅ Approve</button><button class="btn-reject" onclick="updateStatus(${r.id},'Rejected')">❌ Reject</button><a href="https://wa.me/?text=${waMsg}" target="_blank"><button class="btn-wa">💬</button></a>`
+      :`<a href="https://wa.me/?text=${waMsg}" target="_blank" style="flex:1"><button class="btn-wa" style="width:100%;border-radius:9px;padding:9px;border:none;background:rgba(37,211,102,0.1);color:#25d366;font-family:DM Sans,sans-serif;font-weight:600;font-size:12px;cursor:pointer">💬 Notify via WhatsApp</button></a>`;
+    const actionedLine=r.approvedBy?`<div class="approved-by">✅ Approved by <strong>${r.approvedBy}</strong>${r.approvedAt?' · '+timeAgo(r.approvedAt):''}</div>`:r.rejectedBy?`<div class="rejected-by">❌ Rejected by <strong>${r.rejectedBy}</strong>${r.rejectedAt?' · '+timeAgo(r.rejectedAt):''}</div>`:'';
+    return `<div class="request-card"><div class="req-header"><div><div class="req-name">${r.name}</div>${r.dept?`<div class="req-dept">${r.dept}</div>`:''}<div class="req-date">Submitted ${timeAgo(r.submittedAt)}</div></div><span class="badge ${r.status.toLowerCase()}">${r.status}</span></div><div class="req-meta"><div class="meta-chip"><strong>${r.leaveType}</strong>${r.hours?` (${r.hours}h)`:''}</div><div class="meta-chip">📅 ${ds}</div></div><div class="req-reason">💬 ${r.reason}</div><div class="req-handover"><span>Handover:</span> ${r.handover}</div>${actionedLine}<div class="req-actions" style="margin-top:10px">${actionBtns}</div></div>`;
   }).join('');
 }
-function updateStatus(id, status) {
-  const r = requests.find(r=>r.id===id);
-  if (r) {
-    r.status = status;
-    if (status === 'Approved') {
-      const admin = getAdmins().find(a=>a.id===currentAdminId);
-      r.approvedBy = admin ? admin.name : 'Admin';
-      r.approvedAt = new Date().toISOString();
-    } else if (status === 'Rejected') {
-      const admin = getAdmins().find(a=>a.id===currentAdminId);
-      r.approvedBy = null;
-      r.rejectedBy = admin ? admin.name : 'Admin';
-      r.rejectedAt = new Date().toISOString();
-    }
-    save(); renderAdmin(); showToast(status==='Approved'?'✅ Leave approved!':'❌ Leave rejected');
+
+async function updateStatus(id,status) {
+  const r=requests.find(r=>r.id===id);
+  if(r){
+    r.status=status;
+    if(status==='Approved'){const admin=getAdmins().find(a=>a.id===currentAdminId);r.approvedBy=admin?admin.name:'Admin';r.approvedAt=new Date().toISOString();}
+    else if(status==='Rejected'){const admin=getAdmins().find(a=>a.id===currentAdminId);r.approvedBy=null;r.rejectedBy=admin?admin.name:'Admin';r.rejectedAt=new Date().toISOString();}
+    renderAdmin(); showToast(status==='Approved'?'✅ Approved!':'❌ Rejected');
+    await saveRequests();
   }
 }
-function filterRequests(filter, el) {
-  currentFilter=filter; document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); renderAdmin();
-}
+function filterRequests(filter,el){currentFilter=filter;document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderAdmin();}
 
-// ════════════════════════════════════
-// CALENDAR — full names on every day
-// ════════════════════════════════════
-let selectedCalDay = null;
-
-function changeMonth(d) { calMonth+=d; if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
-
-function renderCalendar() {
+// ══════════════════════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════════════════════
+let selectedCalDay=null;
+function changeMonth(d){calMonth+=d;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+function renderCalendar(){
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('calMonthLabel').textContent = `${months[calMonth]} ${calYear}`;
-  const firstDay=new Date(calYear,calMonth,1);
-  const lastDay=new Date(calYear,calMonth+1,0);
-  let startDow=firstDay.getDay(); startDow=startDow===0?6:startDow-1;
-  const today=new Date(); today.setHours(0,0,0,0);
+  document.getElementById('calMonthLabel').textContent=`${months[calMonth]} ${calYear}`;
+  const firstDay=new Date(calYear,calMonth,1),lastDay=new Date(calYear,calMonth+1,0);
+  let startDow=firstDay.getDay();startDow=startDow===0?6:startDow-1;
+  const today=new Date();today.setHours(0,0,0,0);
   const totalCells=Math.ceil((startDow+lastDay.getDate())/7)*7;
-  let html='', dayCount=1-startDow;
-  for (let i=0;i<totalCells;i++) {
+  let html='',dayCount=1-startDow;
+  for(let i=0;i<totalCells;i++){
     const d=new Date(calYear,calMonth,dayCount);
-    const isCurrentMonth=d.getMonth()===calMonth;
-    const isToday=d.getTime()===today.getTime();
+    const isCurrentMonth=d.getMonth()===calMonth,isToday=d.getTime()===today.getTime();
     const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    const dayLeaves=isCurrentMonth ? requests.filter(r=>{
-      const [fy,fm,fd]=r.dateFrom.split('-').map(Number);
-      const from=new Date(fy,fm-1,fd);
-      const rArr=r.dateTo ? r.dateTo.split('-').map(Number) : null;
-      const to=rArr ? new Date(rArr[0],rArr[1]-1,rArr[2]) : from;
-      return d>=from&&d<=to;
-    }) : [];
-    let cls='cal-day'; if(!isCurrentMonth)cls+=' other-month'; if(isToday)cls+=' today';
-    // Show ALL names as pills
-    const pills = dayLeaves.map(r=>`<span class="leave-pill pill-${r.status.toLowerCase()}">${r.name.split(' ')[0]}</span>`).join('');
-    html+=`<div class="${cls}" onclick="showDayDetail('${iso}')">
-      <div class="day-num">${isCurrentMonth?d.getDate():''}</div>
-      ${pills}
-    </div>`;
+    const dayLeaves=isCurrentMonth?requests.filter(r=>{const[fy,fm,fd]=r.dateFrom.split('-').map(Number);const from=new Date(fy,fm-1,fd);const to=r.dateTo?(([ty,tm,td]=r.dateTo.split('-').map(Number)),new Date(ty,tm-1,td)):from;return d>=from&&d<=to;}):[];
+    let cls='cal-day';if(!isCurrentMonth)cls+=' other-month';if(isToday)cls+=' today';
+    const pills=dayLeaves.map(r=>`<span class="leave-pill pill-${r.status.toLowerCase()}">${r.name.split(' ')[0]}</span>`).join('');
+    html+=`<div class="${cls}" onclick="showDayDetail('${iso}')"><div class="day-num">${isCurrentMonth?d.getDate():''}</div>${pills}</div>`;
     dayCount++;
   }
   document.getElementById('calBody').innerHTML=html;
   document.getElementById('dayDetailPanel').classList.remove('show');
-  selectedCalDay = null;
+  selectedCalDay=null;
 }
-
-function showDayDetail(iso) {
-  // Parse date parts directly from ISO string to avoid timezone shifting
-  const [y,m,dd]=iso.split('-').map(Number);
-  const d=new Date(y,m-1,dd); // local midnight, no timezone offset
-  const dayLeaves=requests.filter(r=>{
-    const [fy,fm,fd]=r.dateFrom.split('-').map(Number);
-    const from=new Date(fy,fm-1,fd);
-    const to=r.dateTo ? (([ty,tm,td]=r.dateTo.split('-').map(Number)), new Date(ty,tm-1,td)) : from;
-    return d>=from&&d<=to;
-  });
+function showDayDetail(iso){
+  const[y,m,dd]=iso.split('-').map(Number),d=new Date(y,m-1,dd);
+  const dayLeaves=requests.filter(r=>{const[fy,fm,fd]=r.dateFrom.split('-').map(Number);const from=new Date(fy,fm-1,fd);const to=r.dateTo?(([ty,tm,td]=r.dateTo.split('-').map(Number)),new Date(ty,tm-1,td)):from;return d>=from&&d<=to;});
   const panel=document.getElementById('dayDetailPanel');
-  if (selectedCalDay===iso && panel.classList.contains('show')) {
-    panel.classList.remove('show'); selectedCalDay=null; return;
-  }
+  if(selectedCalDay===iso&&panel.classList.contains('show')){panel.classList.remove('show');selectedCalDay=null;return;}
   selectedCalDay=iso;
   const label=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  document.getElementById('ddpTitle').textContent = `📅 ${label}`;
-  if (!dayLeaves.length) {
-    document.getElementById('ddpRows').innerHTML=`<div style="font-size:13px;color:var(--muted);text-align:center;padding:12px">No leaves on this day</div>`;
-  } else {
-    document.getElementById('ddpRows').innerHTML=dayLeaves.map(r=>`
-      <div class="ddp-row">
-        <div>
-          <div class="ddp-name">${r.name}</div>
-          <div class="ddp-sub">${r.dept||''} · ${r.leaveType}${r.hours?` (${r.hours}h)`:''}</div>
-          <div class="ddp-sub" style="margin-top:2px">💬 ${r.reason}</div>
-          ${r.approvedBy ? `<div class="approved-by" style="margin-top:4px">✅ by ${r.approvedBy}</div>` : r.rejectedBy ? `<div class="rejected-by" style="margin-top:4px">❌ by ${r.rejectedBy}</div>` : ''}
-        </div>
-        <span class="badge ${r.status.toLowerCase()}">${r.status}</span>
-      </div>`).join('');
-  }
+  document.getElementById('ddpTitle').textContent=`📅 ${label}`;
+  if(!dayLeaves.length){document.getElementById('ddpRows').innerHTML=`<div style="font-size:13px;color:var(--muted);text-align:center;padding:12px">No leaves on this day</div>`;}
+  else{document.getElementById('ddpRows').innerHTML=dayLeaves.map(r=>`<div class="ddp-row"><div><div class="ddp-name">${r.name}</div><div class="ddp-sub">${r.dept||''} · ${r.leaveType}${r.hours?` (${r.hours}h)`:''}</div><div class="ddp-sub" style="margin-top:2px">💬 ${r.reason}</div>${r.approvedBy?`<div class="approved-by" style="margin-top:4px">✅ by ${r.approvedBy}</div>`:r.rejectedBy?`<div class="rejected-by" style="margin-top:4px">❌ by ${r.rejectedBy}</div>`:''}</div><span class="badge ${r.status.toLowerCase()}">${r.status}</span></div>`).join('');}
   panel.classList.add('show');
   panel.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-// ════════════════════════════════════
+// ══════════════════════════════════════════════════════
 // HISTORY
-// ════════════════════════════════════
-function searchEmployee() {
-  const q=document.getElementById('empSearch').value.trim().toLowerCase();
-  const drop=document.getElementById('empDrop');
-  if (!q) { drop.classList.remove('show'); return; }
-  const names=[...new Set(requests.map(r=>r.name))].filter(n=>n.toLowerCase().includes(q));
-  if (!names.length) { drop.classList.remove('show'); return; }
-  drop.innerHTML=names.map(n=>{ const dept=requests.find(r=>r.name===n)?.dept||''; return `<div class="emp-option" onclick="selectEmployee('${n.replace(/'/g,"\\'")}')"><div>${n}</div>${dept?`<div class="opt-dept">${dept}</div>`:''}</div>`; }).join('');
-  drop.classList.add('show');
-}
-function selectEmployee(name) {
-  document.getElementById('empSearch').value=name;
-  document.getElementById('empDrop').classList.remove('show');
-  const empReqs=requests.filter(r=>r.name===name).sort((a,b)=>new Date(b.dateFrom)-new Date(a.dateFrom));
-  const dept=empReqs[0]?.dept||'—';
-  const hdr=document.getElementById('histHeader'); hdr.classList.add('show');
-  hdr.innerHTML=`<div class="hist-name">${name}</div><div class="hist-dept">${dept}</div>
-    <div class="hist-stats">
-      <div class="hist-stat"><div class="hist-stat-num" style="color:var(--accent)">${empReqs.filter(r=>r.status==='Approved').length}</div><div class="hist-stat-lbl">Approved</div></div>
-      <div class="hist-stat"><div class="hist-stat-num" style="color:var(--warn)">${empReqs.filter(r=>r.status==='Pending').length}</div><div class="hist-stat-lbl">Pending</div></div>
-      <div class="hist-stat"><div class="hist-stat-num" style="color:var(--accent2)">${empReqs.length}</div><div class="hist-stat-lbl">Total</div></div>
-    </div>`;
-  document.getElementById('histList').innerHTML = empReqs.length
-    ? empReqs.map(r=>{ const ds=r.dateTo&&r.dateTo!==r.dateFrom?`${fmtDate(r.dateFrom)} → ${fmtDate(r.dateTo)}`:fmtDate(r.dateFrom); const byLine = r.approvedBy?`<div class="approved-by" style="margin-top:5px">✅ Approved by ${r.approvedBy}</div>`:r.rejectedBy?`<div class="rejected-by" style="margin-top:5px">❌ Rejected by ${r.rejectedBy}</div>`:''; return `<div class="request-card"><div class="req-header"><div><div class="req-name" style="font-size:13px">${r.leaveType}${r.hours?` (${r.hours}h)`:''}</div><div class="req-date">📅 ${ds}</div></div><span class="badge ${r.status.toLowerCase()}">${r.status}</span></div><div class="req-reason">💬 ${r.reason}</div>${byLine}</div>`; }).join('')
-    : `<div class="no-requests"><div class="big">📭</div><p>No records found.</p></div>`;
-}
-document.addEventListener('click', e=>{ if (!e.target.closest('.emp-search-wrap')) document.getElementById('empDrop').classList.remove('show'); });
+// ══════════════════════════════════════════════════════
+function searchEmployee(){const q=document.getElementById('empSearch').value.trim().toLowerCase();const drop=document.getElementById('empDrop');if(!q){drop.classList.remove('show');return;}const names=[...new Set(requests.map(r=>r.name))].filter(n=>n.toLowerCase().includes(q));if(!names.length){drop.classList.remove('show');return;}drop.innerHTML=names.map(n=>{const dept=requests.find(r=>r.name===n)?.dept||'';return`<div class="emp-option" onclick="selectEmployee('${n.replace(/'/g,"\\'")}')"><div>${n}</div>${dept?`<div class="opt-dept">${dept}</div>`:''}</div>`;}).join('');drop.classList.add('show');}
+function selectEmployee(name){document.getElementById('empSearch').value=name;document.getElementById('empDrop').classList.remove('show');const empReqs=requests.filter(r=>r.name===name).sort((a,b)=>new Date(b.dateFrom)-new Date(a.dateFrom));const dept=empReqs[0]?.dept||'—';const hdr=document.getElementById('histHeader');hdr.classList.add('show');hdr.innerHTML=`<div class="hist-name">${name}</div><div class="hist-dept">${dept}</div><div class="hist-stats"><div class="hist-stat"><div class="hist-stat-num" style="color:var(--accent)">${empReqs.filter(r=>r.status==='Approved').length}</div><div class="hist-stat-lbl">Approved</div></div><div class="hist-stat"><div class="hist-stat-num" style="color:var(--warn)">${empReqs.filter(r=>r.status==='Pending').length}</div><div class="hist-stat-lbl">Pending</div></div><div class="hist-stat"><div class="hist-stat-num" style="color:var(--accent2)">${empReqs.length}</div><div class="hist-stat-lbl">Total</div></div></div>`;document.getElementById('histList').innerHTML=empReqs.length?empReqs.map(r=>{const ds=r.dateTo&&r.dateTo!==r.dateFrom?`${fmtDate(r.dateFrom)} → ${fmtDate(r.dateTo)}`:fmtDate(r.dateFrom);const byLine=r.approvedBy?`<div class="approved-by" style="margin-top:5px">✅ Approved by ${r.approvedBy}</div>`:r.rejectedBy?`<div class="rejected-by" style="margin-top:5px">❌ Rejected by ${r.rejectedBy}</div>`:'';return`<div class="request-card"><div class="req-header"><div><div class="req-name" style="font-size:13px">${r.leaveType}${r.hours?` (${r.hours}h)`:''}</div><div class="req-date">📅 ${ds}</div></div><span class="badge ${r.status.toLowerCase()}">${r.status}</span></div><div class="req-reason">💬 ${r.reason}</div>${byLine}</div>`;}).join(''):`<div class="no-requests"><div class="big">📭</div><p>No records found.</p></div>`;}
+document.addEventListener('click',e=>{if(!e.target.closest('.emp-search-wrap'))document.getElementById('empDrop').classList.remove('show');});
 
-// ════════════════════════════════════
+// ══════════════════════════════════════════════════════
 // REPORT
-// ════════════════════════════════════
-function populateWeeks() {
-  const sel=document.getElementById('weekSelect'), cur=sel.value;
-  sel.innerHTML='<option value="all">All Time</option>';
-  const weeks=new Set();
-  requests.forEach(r=>{ const d=new Date(r.dateFrom+'T00:00:00'),mon=new Date(d); mon.setDate(d.getDate()-((d.getDay()+6)%7)); weeks.add(mon.toISOString().split('T')[0]); });
-  [...weeks].sort().reverse().forEach(w=>{ const end=new Date(w+'T00:00:00'); end.setDate(end.getDate()+6); const opt=document.createElement('option'); opt.value=w; opt.textContent=`${fmtDate(w)} – ${fmtDate(end.toISOString().split('T')[0])}`; sel.appendChild(opt); });
-  if (cur) sel.value=cur;
-}
-function renderReport() {
-  const week=document.getElementById('weekSelect').value;
-  let filtered=requests;
-  if (week!=='all') { const start=new Date(week+'T00:00:00'),end=new Date(week+'T00:00:00'); end.setDate(end.getDate()+6); filtered=requests.filter(r=>{ const d=new Date(r.dateFrom+'T00:00:00'); return d>=start&&d<=end; }); }
-  const body=document.getElementById('reportBody');
-  if (!filtered.length) { body.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:26px">No records for this period</td></tr>`; return; }
-  body.innerHTML=filtered.map(r=>{ const ds=r.dateTo&&r.dateTo!==r.dateFrom?`${fmtDate(r.dateFrom)}–${fmtDate(r.dateTo)}`:fmtDate(r.dateFrom); const color=r.status==='Approved'?'var(--accent)':r.status==='Rejected'?'var(--danger)':'var(--warn)'; const actioned=r.approvedBy?r.approvedBy:r.rejectedBy?r.rejectedBy:'—'; return `<tr><td style="font-weight:700">${r.name}</td><td style="color:var(--accent2)">${r.dept||'—'}</td><td>${r.leaveType}${r.hours?` (${r.hours}h)`:''}</td><td style="white-space:nowrap">${ds}</td><td style="color:${color};font-weight:700">${r.status}</td><td style="color:var(--muted)">${actioned}</td><td style="color:var(--muted)">${r.reason}</td></tr>`; }).join('');
-}
-function exportCSV() {
-  if (!requests.length) { showToast('⚠️ No data to export'); return; }
-  const week=document.getElementById('weekSelect').value;
-  let filtered=requests;
-  if (week!=='all') { const start=new Date(week+'T00:00:00'),end=new Date(week+'T00:00:00'); end.setDate(end.getDate()+6); filtered=requests.filter(r=>{ const d=new Date(r.dateFrom+'T00:00:00'); return d>=start&&d<=end; }); }
-  const rows=[['Name','Department','Leave Type','Hours','Date From','Date To','Reason','Handover','Status','Actioned By','Submitted At']];
-  filtered.forEach(r=>rows.push([r.name,r.dept||'',r.leaveType,r.hours||'',r.dateFrom,r.dateTo||'',r.reason,r.handover,r.status,r.approvedBy||r.rejectedBy||'',r.submittedAt]));
-  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download=`leave-report-${week==='all'?'all':week}.csv`; a.click();
-  showToast('📊 CSV exported for HR!');
-}
+// ══════════════════════════════════════════════════════
+function populateWeeks(){const sel=document.getElementById('weekSelect'),cur=sel.value;sel.innerHTML='<option value="all">All Time</option>';const weeks=new Set();requests.forEach(r=>{const d=new Date(r.dateFrom+'T00:00:00'),mon=new Date(d);mon.setDate(d.getDate()-((d.getDay()+6)%7));weeks.add(mon.toISOString().split('T')[0]);});[...weeks].sort().reverse().forEach(w=>{const end=new Date(w+'T00:00:00');end.setDate(end.getDate()+6);const opt=document.createElement('option');opt.value=w;opt.textContent=`${fmtDate(w)} – ${fmtDate(end.toISOString().split('T')[0])}`;sel.appendChild(opt);});if(cur)sel.value=cur;}
+function renderReport(){const week=document.getElementById('weekSelect').value;let filtered=requests;if(week!=='all'){const start=new Date(week+'T00:00:00'),end=new Date(week+'T00:00:00');end.setDate(end.getDate()+6);filtered=requests.filter(r=>{const d=new Date(r.dateFrom+'T00:00:00');return d>=start&&d<=end;});}const body=document.getElementById('reportBody');if(!filtered.length){body.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:26px">No records for this period</td></tr>`;return;}body.innerHTML=filtered.map(r=>{const ds=r.dateTo&&r.dateTo!==r.dateFrom?`${fmtDate(r.dateFrom)}–${fmtDate(r.dateTo)}`:fmtDate(r.dateFrom);const color=r.status==='Approved'?'var(--accent)':r.status==='Rejected'?'var(--danger)':'var(--warn)';const actioned=r.approvedBy?r.approvedBy:r.rejectedBy?r.rejectedBy:'—';return`<tr><td style="font-weight:700">${r.name}</td><td style="color:var(--accent2)">${r.dept||'—'}</td><td>${r.leaveType}${r.hours?` (${r.hours}h)`:''}</td><td style="white-space:nowrap">${ds}</td><td style="color:${color};font-weight:700">${r.status}</td><td style="color:var(--muted)">${actioned}</td><td style="color:var(--muted)">${r.reason}</td></tr>`;}).join('');}
+function exportCSV(){if(!requests.length){showToast('⚠️ No data to export');return;}const week=document.getElementById('weekSelect').value;let filtered=requests;if(week!=='all'){const start=new Date(week+'T00:00:00'),end=new Date(week+'T00:00:00');end.setDate(end.getDate()+6);filtered=requests.filter(r=>{const d=new Date(r.dateFrom+'T00:00:00');return d>=start&&d<=end;});}const rows=[['Name','Department','Leave Type','Hours','Date From','Date To','Reason','Handover','Status','Actioned By','Submitted At']];filtered.forEach(r=>rows.push([r.name,r.dept||'',r.leaveType,r.hours||'',r.dateFrom,r.dateTo||'',r.reason,r.handover,r.status,r.approvedBy||r.rejectedBy||'',r.submittedAt]));const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`leave-report-${week==='all'?'all':week}.csv`;a.click();showToast('📊 CSV exported!');}
 
-// ════════════════════════════════════
+// ══════════════════════════════════════════════════════
 // SETTINGS
-// ════════════════════════════════════
-function loadSettings() {
+// ══════════════════════════════════════════════════════
+function loadSettings(){
   const s=getSettings();
   document.getElementById('settingAnnual').value=s.annual;
   document.getElementById('settingMedical').value=s.medical;
-  renderAdminList();
-  renderDeptTags();
-  loadPeriodSettings();
+  renderAdminList(); renderDeptTags(); loadPeriodSettings();
 }
-
-// ── Admins ──
-function renderAdminList() {
+function renderAdminList(){
   const admins=getAdmins();
-  document.getElementById('adminList').innerHTML = admins.map(a=>`
-    <div class="admin-item">
-      <div class="admin-item-info">
-        <div class="admin-item-name">👤 ${a.name}</div>
-        <div class="admin-item-role">${a.role}</div>
-        <div class="admin-item-pin">PIN: ${'•'.repeat(a.pin.length)}</div>
-      </div>
-      ${admins.length>1 ? `<button class="btn-remove-admin" onclick="removeAdmin(${a.id})">Remove</button>` : '<span style="font-size:11px;color:var(--muted)">Primary</span>'}
-    </div>`).join('');
+  document.getElementById('adminList').innerHTML=admins.map(a=>`<div class="admin-item"><div class="admin-item-info"><div class="admin-item-name">👤 ${a.name}</div><div class="admin-item-role">${a.role}</div><div class="admin-item-pin">PIN: ${'•'.repeat(a.pin.length)}</div></div>${admins.length>1?`<button class="btn-remove-admin" onclick="removeAdmin(${a.id})">Remove</button>`:'<span style="font-size:11px;color:var(--muted)">Primary</span>'}</div>`).join('');
 }
-function addAdmin() {
-  const name=document.getElementById('newAdminName').value.trim();
-  const role=document.getElementById('newAdminRole').value.trim();
-  const pin=document.getElementById('newAdminPin').value;
-  const pinC=document.getElementById('newAdminPinConfirm').value;
-  if (!name) { showToast('⚠️ Enter admin name'); return; }
-  if (!/^\d{4}$/.test(pin)) { showToast('⚠️ PIN must be 4 digits'); return; }
-  if (pin!==pinC) { showToast('⚠️ PINs do not match'); return; }
-  const admins=getAdmins();
-  const newId=Date.now();
-  admins.push({ id:newId, name, role:role||'Admin', pin });
-  saveAdmins(admins);
+async function addAdmin(){
+  const name=document.getElementById('newAdminName').value.trim(),role=document.getElementById('newAdminRole').value.trim();
+  const pin=document.getElementById('newAdminPin').value,pinC=document.getElementById('newAdminPinConfirm').value;
+  if(!name){showToast('⚠️ Enter admin name');return;}
+  if(!/^\d{4}$/.test(pin)){showToast('⚠️ PIN must be 4 digits');return;}
+  if(pin!==pinC){showToast('⚠️ PINs do not match');return;}
+  config.admins.push({id:Date.now(),name,role:role||'Admin',pin});
   ['newAdminName','newAdminRole','newAdminPin','newAdminPinConfirm'].forEach(id=>document.getElementById(id).value='');
-  renderAdminList();
-  showToast('✅ Admin added!');
+  renderAdminList(); showToast('✅ Admin added!');
+  await saveConfig();
 }
-function removeAdmin(id) {
-  const admins=getAdmins();
-  if (admins.length<=1) { showToast('⚠️ Cannot remove the last admin'); return; }
-  if (!confirm('Remove this admin account?')) return;
-  saveAdmins(admins.filter(a=>a.id!==id));
-  renderAdminList();
-  showToast('🗑️ Admin removed');
+async function removeAdmin(id){
+  if(config.admins.length<=1){showToast('⚠️ Cannot remove the last admin');return;}
+  if(!confirm('Remove this admin account?'))return;
+  config.admins=config.admins.filter(a=>a.id!==id);
+  renderAdminList(); showToast('🗑️ Admin removed');
+  await saveConfig();
 }
-
-// ── Departments ──
-function renderDeptTags() {
-  const depts=getDepts();
-  document.getElementById('deptTags').innerHTML = depts.map(d=>`
-    <div class="dept-tag">
-      <span>${d}</span>
-      <button class="remove-dept" onclick="removeDept('${d.replace(/'/g,"\\'")}')">✕</button>
-    </div>`).join('');
+function renderDeptTags(){
+  document.getElementById('deptTags').innerHTML=getDepts().map(d=>`<div class="dept-tag"><span>${d}</span><button class="remove-dept" onclick="removeDept('${d.replace(/'/g,"\\'")}')">✕</button></div>`).join('');
   populateDeptDropdown();
 }
-function addDept() {
+async function addDept(){
   const val=document.getElementById('newDeptInput').value.trim();
-  if (!val) return;
-  const depts=getDepts();
-  if (depts.map(d=>d.toLowerCase()).includes(val.toLowerCase())) { showToast('⚠️ Department already exists'); return; }
-  depts.push(val);
-  saveDepts(depts);
+  if(!val)return;
+  if(config.depts.map(d=>d.toLowerCase()).includes(val.toLowerCase())){showToast('⚠️ Already exists');return;}
+  config.depts.push(val);
   document.getElementById('newDeptInput').value='';
-  renderDeptTags();
-  showToast('✅ Department added!');
+  renderDeptTags(); showToast('✅ Department added!');
+  await saveConfig();
 }
-function removeDept(name) {
-  const depts=getDepts().filter(d=>d!==name);
-  saveDepts(depts);
-  renderDeptTags();
-  showToast('🗑️ Department removed');
+async function removeDept(name){
+  config.depts=config.depts.filter(d=>d!==name);
+  renderDeptTags(); showToast('🗑️ Department removed');
+  await saveConfig();
 }
-
-function saveBalanceSettings() {
-  const annual=parseInt(document.getElementById('settingAnnual').value)||14;
-  const medical=parseInt(document.getElementById('settingMedical').value)||14;
-  const d=cd(); if(d){ d.settings={annual,medical}; window._saveCloudData(); }
+async function saveBalanceSettings(){
+  config.settings.annual=parseInt(document.getElementById('settingAnnual').value)||14;
+  config.settings.medical=parseInt(document.getElementById('settingMedical').value)||14;
   showToast('✅ Leave allowance saved!');
+  await saveConfig();
 }
-function clearAllData() {
-  if (!confirm('Are you sure? This will permanently delete ALL leave data and cannot be undone.')) return;
-  requests=[]; save(); showToast('🗑️ All data cleared.');
+async function clearAllData(){
+  if(!confirm('Permanently delete ALL leave data?'))return;
+  requests=[];
+  await saveRequests();
+  showToast('🗑️ All data cleared.');
 }
 
-// ════════════════════════════════════
+// ══════════════════════════════════════════════════════
 // HELPERS
-// ════════════════════════════════════
-function fmtDate(str) { if(!str)return''; return new Date(str+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
-function timeAgo(iso) { const s=(Date.now()-new Date(iso))/1000; if(s<60)return'just now'; if(s<3600)return Math.floor(s/60)+'m ago'; if(s<86400)return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
-function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+// ══════════════════════════════════════════════════════
+function fmtDate(str){if(!str)return'';return new Date(str+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
+function timeAgo(iso){const s=(Date.now()-new Date(iso))/1000;if(s<60)return'just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
-// ════════════════════════════════════
-// INIT — load Firebase data then start
-// ════════════════════════════════════
-(async function init() {
-  document.body.insertAdjacentHTML('beforeend', `
-    <div id="loadingScreen" style="position:fixed;inset:0;background:#0f1117;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:14px;">
-      <div style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:#4ade80">LeaveEasy</div>
-      <div style="width:36px;height:36px;border:3px solid #2e3347;border-top-color:#4ade80;border-radius:50%;animation:spin 0.8s linear infinite"></div>
-      <div style="font-size:12px;color:#64748b">Connecting to database…</div>
-      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-    </div>`);
-
-  // Wait for the Firebase module to expose its functions
-  let waited = 0;
-  while (!window._loadCloudData && waited < 5000) {
-    await new Promise(r => setTimeout(r, 50)); waited += 50;
-  }
-
-  if (window._loadCloudData) await window._loadCloudData();
-  const d = cd();
-  requests = (d && d.requests) ? d.requests : JSON.parse(localStorage.getItem('leaveEasy_v2') || '[]');
-
-  document.getElementById('loadingScreen').remove();
-  document.getElementById('dateFrom').valueAsDate = new Date();
-  populateDeptDropdown();
-  renderPeriodBanner();
-})();
+// ══════════════════════════════════════════════════════
+// START
+// ══════════════════════════════════════════════════════
+initApp();
 </script>
 </body>
 </html>
