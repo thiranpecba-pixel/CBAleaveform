@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>LeaveEasy</title>
+<title>CBA Leave Easy</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root {
   --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--surface3:#2a2e42;
@@ -51,14 +52,7 @@ select option{background:var(--surface2);}
 .hours-row{display:none;}
 .hours-row.visible{display:block;}
 
-/* BALANCE */
-.balance-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:15px;margin-bottom:16px;}
-.balance-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;}
-.balance-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-.balance-label{font-size:13px;font-weight:600;}
-.balance-days{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;}
-.bal-bar{height:5px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:12px;}
-.bal-fill{height:100%;border-radius:99px;transition:width 0.5s ease;}
+
 
 /* BUTTONS */
 .btn-submit{width:100%;padding:14px;background:var(--accent);color:#0f1117;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;border:none;border-radius:var(--radius);cursor:pointer;transition:all 0.2s;margin-top:6px;}
@@ -240,311 +234,94 @@ select option{background:var(--surface2);}
 .rejected-by{font-size:11px;color:var(--danger);background:rgba(248,113,113,0.1);border-radius:6px;padding:3px 8px;margin-top:4px;display:inline-block;}
 /* CLOSED OVERLAY on apply page */
 .closed-overlay{background:var(--surface);border:1.5px solid var(--danger);border-radius:var(--radius);padding:32px 20px;text-align:center;margin-top:14px;}
+/* REJECTION MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,17,23,0.92);display:none;align-items:center;justify-content:center;z-index:998;padding:24px;backdrop-filter:blur(4px);}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:26px 22px;max-width:340px;width:100%;}
+.modal-box h3{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;margin-bottom:5px;}
+.modal-box p{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;}
+.modal-box textarea{width:100%;padding:11px 13px;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;min-height:90px;transition:border-color 0.2s;}
+.modal-box textarea:focus{border-color:var(--danger);}
+.modal-actions{display:flex;gap:8px;margin-top:14px;}
+.btn-modal-confirm{flex:1;padding:11px;background:var(--danger);color:#fff;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;}
+.btn-modal-cancel{flex:1;padding:11px;background:var(--surface2);color:var(--muted);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:13px;cursor:pointer;}
+/* ADMIN SEARCH */
+.admin-search-wrap{margin-bottom:12px;}
+.admin-search-wrap input{background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-size:13px;padding:10px 14px;}
+.admin-search-wrap input:focus{border-color:var(--accent2);}
+/* RECEIPT */
+.receipt-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:12px 0 0;text-align:left;}
+.receipt-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:10px;}
+.receipt-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.receipt-row:last-child{border-bottom:none;}
+.receipt-row .rl{color:var(--muted);}
+.receipt-row .rv{font-weight:700;color:var(--text);text-align:right;max-width:60%;}
+.receipt-ref{font-family:'Syne',sans-serif;font-size:13px;color:var(--accent);font-weight:800;letter-spacing:0.5px;}
+.receipt-hint{font-size:10px;color:var(--muted);margin-top:10px;text-align:center;}
+/* OVERLAP WARNING */
+.overlap-warn{background:rgba(251,146,60,0.1);border:1.5px solid var(--warn);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:13px;display:none;}
+.overlap-warn.show{display:block;}
+.overlap-warn strong{color:var(--warn);}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--surface2);border:1px solid var(--border);border-radius:30px;padding:10px 18px;font-size:13px;z-index:9999;opacity:0;transition:all 0.28s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.4);}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+/* EPF SELF-LOOKUP */
+.epf-lookup-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px;}
+.epf-lookup-section h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--accent2);margin-bottom:4px;}
+.epf-lookup-section p{font-size:12px;color:var(--muted);margin-bottom:12px;}
+.epf-lookup-row{display:flex;gap:8px;}
+.epf-lookup-row input{flex:1;}
+.btn-lookup{padding:0 16px;background:var(--accent2);color:#0f1117;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;}
+.btn-lookup:active{transform:scale(0.97);}
+.epf-results{margin-top:14px;display:none;}
+.epf-results.show{display:block;}
+.epf-results-header{background:var(--surface2);border-radius:10px;padding:12px 13px;margin-bottom:10px;}
+.epf-results-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;}
+.epf-results-dept{font-size:12px;color:var(--accent2);margin-top:2px;}
+.epf-results-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;}
+.epf-results-stat{background:var(--surface);border-radius:8px;padding:8px 6px;text-align:center;}
+.epf-results-stat-num{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;}
+.epf-results-stat-lbl{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;}
+.epf-no-results{text-align:center;padding:20px;color:var(--muted);font-size:13px;}
+.epf-req-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;}
+.epf-req-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.epf-req-type{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;}
+.epf-req-date{font-size:11px;color:var(--muted);margin-top:2px;}
+.epf-req-reason{font-size:12px;color:var(--muted);margin-bottom:6px;line-height:1.4;}
+.epf-req-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.btn-cancel-req{padding:6px 12px;background:rgba(248,113,113,0.1);color:var(--danger);border:1px solid rgba(248,113,113,0.25);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.18s;}
+.btn-cancel-req:hover{background:var(--danger);color:#fff;}
+.badge.cancelled{background:rgba(167,139,250,0.15);color:var(--purple);}
+.badge.cancelrequested{background:rgba(251,146,60,0.15);color:var(--warn);}
+.btn-approve-cancel{flex:1;padding:9px 7px;border-radius:9px;border:none;font-family:'DM Sans',sans-serif;font-weight:600;font-size:12px;cursor:pointer;transition:all 0.18s;background:rgba(167,139,250,0.12);color:var(--purple);}
+.btn-approve-cancel:hover{background:var(--purple);color:#fff;}
+.btn-reject-cancel{flex:1;padding:9px 7px;border-radius:9px;border:none;font-family:'DM Sans',sans-serif;font-weight:600;font-size:12px;cursor:pointer;transition:all 0.18s;background:rgba(248,113,113,0.1);color:var(--danger);}
+.btn-reject-cancel:hover{background:var(--danger);color:#fff;}
 </style>
 <!-- Firebase SDK -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // ════════════════════════════════════
-  // 🔧 PASTE YOUR FIREBASE CONFIG HERE
-  // (Replace ALL values below with your own from Firebase Console)
-  // ════════════════════════════════════
-  const firebaseConfig = {
-    apiKey: "AIzaSyD9baMvEDGOHo3n-6QiWlEFoGNhtkfP9Co",
-    authDomain: "cba-pos-leave-sheet.firebaseapp.com",
-    projectId: "cba-pos-leave-sheet",
-    storageBucket: "cba-pos-leave-sheet.firebasestorage.app",
-    messagingSenderId: "100028126145",
-    appId: "1:100028126145:web:5607f8555de1fb38b05540",
-  };
+// ════════════════════════════════════
+// 🔧 PASTE YOUR FIREBASE CONFIG HERE
+// ════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyD9baMvEDGOHo3n-6QiWlEFoGNhtkfP9Co",
+  authDomain: "cba-pos-leave-sheet.firebaseapp.com",
+  projectId: "cba-pos-leave-sheet",
+  storageBucket: "cba-pos-leave-sheet.firebasestorage.app",
+  messagingSenderId: "100028126145",
+  appId: "1:100028126145:web:5607f8555de1fb38b05540"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
 
-  // ══ Expose db and Firestore helpers to global scope ══
-  window._db = db;
-  window._doc = doc;
-  window._getDoc = getDoc;
-  window._setDoc = setDoc;
-  window._collection = collection;
-  window._getDocs = getDocs;
-  window._addDoc = addDoc;
-  window._updateDoc = updateDoc;
-  window._deleteDoc = deleteDoc;
-  window._onSnapshot = onSnapshot;
-  window._query = query;
-  window._orderBy = orderBy;
-
-  // Signal that Firebase is ready
-  window._firebaseReady = true;
-  document.dispatchEvent(new Event('firebaseReady'));
-</script>
-</head>
-<body>
-
-<!-- PIN OVERLAY -->
-<div class="pin-overlay" id="pinOverlay">
-  <div class="pin-box">
-    <div style="font-size:32px;margin-bottom:10px">🔐</div>
-    <h2>Admin Access</h2>
-    <p id="pinPromptText">Select an admin account</p>
-
-    <!-- Step 1: pick admin -->
-    <div class="admin-select-list" id="adminSelectList"></div>
-
-    <!-- Step 2: enter PIN -->
-    <div id="pinStep" style="display:none">
-      <div style="font-size:12px;color:var(--accent2);margin-bottom:14px;font-weight:600" id="selectedAdminLabel"></div>
-      <div class="pin-input">
-        <input type="password" maxlength="1" id="p1" inputmode="numeric">
-        <input type="password" maxlength="1" id="p2" inputmode="numeric">
-        <input type="password" maxlength="1" id="p3" inputmode="numeric">
-        <input type="password" maxlength="1" id="p4" inputmode="numeric">
-      </div>
-      <p class="pin-error" id="pinError">❌ Incorrect PIN. Try again.</p>
-      <button class="btn-pin" onclick="checkPin()">Unlock →</button>
-      <div style="margin-top:10px"><button onclick="backToAdminSelect()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">← Back</button></div>
-    </div>
-  </div>
-</div>
-
-<!-- NAV -->
-<nav class="nav">
-  <div class="nav-logo">Leave<span>Easy</span></div>
-  <div class="nav-tabs">
-    <button class="nav-tab active" id="tab-apply" onclick="showPage('apply')">Apply</button>
-    <button class="nav-tab" id="tab-calendar" onclick="showPage('calendar',true)">📅 Calendar</button>
-    <button class="nav-tab" id="tab-admin" onclick="showPage('admin',true)">Admin</button>
-    <button class="nav-tab" id="tab-history" onclick="showPage('history',true)">History</button>
-    <button class="nav-tab" id="tab-report" onclick="showPage('report',true)">Report</button>
-    <button class="nav-tab" id="tab-settings" onclick="showPage('settings',true)">⚙️</button>
-  </div>
-</nav>
-
-<!-- ═══════════ APPLY ═══════════ -->
-<div class="page active" id="page-apply">
-  <h1>Apply Leave 🗓️</h1>
-  <p class="subtitle">Fill in the details. Your request will be sent to admin for review.</p>
-
-  <div id="periodBanner"></div>
-
-
-  <div class="success-box" id="successBox">
-    <div class="success-icon">✅</div>
-    <h3>Request Submitted!</h3>
-    <p>Your leave request has been sent for approval.<br>You'll be notified once reviewed.</p>
-    <button class="btn-new" onclick="resetForm()">+ New Request</button>
-  </div>
-
-  <div id="applyForm">
-    <div class="form-group">
-      <label>Your Full Name</label>
-      <input type="text" id="empName" placeholder="Enter your full name" autocomplete="name">
-    </div>
-    <div class="form-group">
-      <label>Department</label>
-      <select id="empDept"><option value="">— Select Department —</option></select>
-    </div>
-    <div class="form-group">
-      <label>Leave Type</label>
-      <div class="leave-types">
-        <div class="leave-card" onclick="selectLeave(this,'Full Day')"><div class="icon">🌙</div><div class="lbl">Full Day</div><div class="desc">Entire day off</div></div>
-        <div class="leave-card" onclick="selectLeave(this,'Half Day AM')"><div class="icon">🌅</div><div class="lbl">Half Day AM</div><div class="desc">Morning off</div></div>
-        <div class="leave-card" onclick="selectLeave(this,'Half Day PM')"><div class="icon">🌇</div><div class="lbl">Half Day PM</div><div class="desc">Afternoon off</div></div>
-        <div class="leave-card" onclick="selectLeave(this,'Short Leave')"><div class="icon">⏱️</div><div class="lbl">Short Leave</div><div class="desc">Few hours only</div></div>
-      </div>
-    </div>
-    <div class="form-group hours-row" id="hoursRow">
-      <label>Hours Needed</label>
-      <select id="hoursNeeded">
-        <option value="1">1 hour</option><option value="1.5">1.5 hours</option>
-        <option value="2">2 hours</option><option value="2.5">2.5 hours</option><option value="3">3 hours</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Leave Date(s)</label>
-      <div class="two-col"><input type="date" id="dateFrom"><input type="date" id="dateTo"></div>
-      <div style="font-size:11px;color:var(--muted);margin-top:5px">Leave end date empty if single day</div>
-    </div>
-    <div class="form-group"><label>Reason</label><textarea id="reason" placeholder="e.g. Medical appointment, family matter..."></textarea></div>
-    <div class="form-group"><label>Handover / Coverage Plan</label><textarea id="handover" placeholder="Who will cover your work? Any tasks to handover?"></textarea></div>
-    <button class="btn-submit" id="submitBtn" onclick="submitLeave()">Submit Request →</button>
-  </div>
-</div>
-
-<!-- ═══════════ CALENDAR ═══════════ -->
-<div class="page" id="page-calendar">
-  <h1>Leave Calendar 📅</h1>
-  <p class="subtitle">Full monthly view — tap any date to see details.</p>
-  <div class="cal-nav no-print">
-    <button class="cal-btn" onclick="changeMonth(-1)">‹</button>
-    <h2 id="calMonthLabel"></h2>
-    <button class="cal-btn" onclick="changeMonth(1)">›</button>
-  </div>
-  <div class="cal-legend">
-    <div class="leg-item"><div class="leg-dot" style="background:rgba(74,222,128,0.3)"></div>Approved</div>
-    <div class="leg-item"><div class="leg-dot" style="background:rgba(251,146,60,0.3)"></div>Pending</div>
-    <div class="leg-item"><div class="leg-dot" style="background:rgba(248,113,113,0.2)"></div>Rejected</div>
-  </div>
-  <div class="cal-grid">
-    <div class="cal-header-row">
-      <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
-    </div>
-    <div class="cal-body" id="calBody"></div>
-  </div>
-  <!-- Day detail panel shown below calendar -->
-  <div class="day-detail-panel" id="dayDetailPanel">
-    <div class="ddp-title" id="ddpTitle"></div>
-    <div id="ddpRows"></div>
-  </div>
-</div>
-
-<!-- ═══════════ ADMIN ═══════════ -->
-<div class="page" id="page-admin">
-  <h1>Admin Panel 🛡️</h1>
-  <p class="subtitle" id="adminWelcome">Review leave requests.</p>
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-num orange" id="statPending">0</div><div class="stat-label">Pending</div></div>
-    <div class="stat-card"><div class="stat-num green" id="statApproved">0</div><div class="stat-label">Approved</div></div>
-    <div class="stat-card"><div class="stat-num blue" id="statTotal">0</div><div class="stat-label">Total</div></div>
-  </div>
-  <div class="filter-tabs">
-    <button class="filter-tab active" onclick="filterRequests('all',this)">All</button>
-    <button class="filter-tab" onclick="filterRequests('Pending',this)">⏳ Pending</button>
-    <button class="filter-tab" onclick="filterRequests('Approved',this)">✅ Approved</button>
-    <button class="filter-tab" onclick="filterRequests('Rejected',this)">❌ Rejected</button>
-  </div>
-  <div id="requestsList"></div>
-</div>
-
-<!-- ═══════════ HISTORY ═══════════ -->
-<div class="page" id="page-history">
-  <h1>Employee History 👤</h1>
-  <p class="subtitle">Search an employee to view their full leave record.</p>
-  <div class="emp-search-wrap">
-    <input type="text" id="empSearch" placeholder="🔍  Search employee name..." oninput="searchEmployee()" autocomplete="off">
-    <div class="emp-list-drop" id="empDrop"></div>
-  </div>
-  <div class="history-header" id="histHeader"></div>
-  <div id="histList"></div>
-</div>
-
-<!-- ═══════════ REPORT ═══════════ -->
-<div class="page" id="page-report">
-  <div class="report-header">
-    <div><h1>HR Report 📊</h1><p class="subtitle" style="margin-bottom:0">Weekly leave summary</p></div>
-    <div class="report-btns no-print">
-      <button class="btn-export" onclick="exportCSV()">⬇ CSV</button>
-    </div>
-  </div>
-  <div class="week-selector no-print">
-    <span class="week-label">Period:</span>
-    <select id="weekSelect" onchange="renderReport()"><option value="all">All Time</option></select>
-  </div>
-  <div class="report-wrap">
-    <table class="report-table">
-      <thead><tr><th>Name</th><th>Dept</th><th>Type</th><th>Date</th><th>Status</th><th>Actioned By</th><th>Reason</th></tr></thead>
-      <tbody id="reportBody"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- ═══════════ SETTINGS ═══════════ -->
-<div class="page" id="page-settings">
-  <h1>Settings ⚙️</h1>
-  <p class="subtitle">Configure the app for your organisation.</p>
-
-  <!-- ADMINS -->
-  <div class="settings-section">
-    <h3>👥 Admin Accounts</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:13px">Each admin has their own name and PIN. You must be logged in as an existing admin to make changes.</p>
-    <div class="admin-list" id="adminList"></div>
-    <div class="add-admin-form">
-      <h4>➕ Add New Admin</h4>
-      <div class="form-group"><label>Admin Name</label><input type="text" id="newAdminName" placeholder="e.g. Sarah (HR)"></div>
-      <div class="form-group"><label>Role / Title</label><input type="text" id="newAdminRole" placeholder="e.g. HR Manager"></div>
-      <div class="two-col">
-        <div class="form-group"><label>PIN</label><input type="password" id="newAdminPin" placeholder="4 digits" maxlength="4" inputmode="numeric"></div>
-        <div class="form-group"><label>Confirm PIN</label><input type="password" id="newAdminPinConfirm" placeholder="Repeat" maxlength="4" inputmode="numeric"></div>
-      </div>
-      <button class="btn-save" onclick="addAdmin()">Add Admin</button>
-    </div>
-  </div>
-
-  <!-- DEPARTMENTS -->
-  <div class="settings-section">
-    <h3>🏢 Departments</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Add or remove department names used in the Apply form.</p>
-    <div class="dept-tags" id="deptTags"></div>
-    <div class="add-dept-row">
-      <input type="text" id="newDeptInput" placeholder="New department name" maxlength="40" onkeydown="if(event.key==='Enter')addDept()">
-      <button class="btn-add" onclick="addDept()">Add</button>
-    </div>
-  </div>
-
-  <!-- LEAVE PERIOD -->
-  <div class="settings-section">
-    <h3>⏰ Application Time Window</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Set the daily hours when employees <strong style="color:var(--text)">cannot</strong> submit leave requests. Outside these blocked hours, applications are open. Leave both empty to allow anytime.</p>
-
-    <!-- Toggle -->
-    <div class="toggle-row" id="periodToggleRow">
-      <span style="font-size:13px;font-weight:600">Enable blocked hours</span>
-      <div class="toggle-switch" id="periodToggle" onclick="togglePeriodEnabled()">
-        <div class="toggle-knob" id="periodKnob"></div>
-      </div>
-    </div>
-
-    <div id="periodFields" style="margin-top:14px">
-      <div class="two-col">
-        <div class="form-group">
-          <label>Block From</label>
-          <input type="time" id="blockFrom" value="00:00" oninput="updatePeriodPreview()">
-        </div>
-        <div class="form-group">
-          <label>Block Until</label>
-          <input type="time" id="blockTo" value="06:00" oninput="updatePeriodPreview()">
-        </div>
-      </div>
-      <div class="period-preview" id="periodPreview"></div>
-      <button class="btn-save" onclick="savePeriod()">Save Time Window</button>
-    </div>
-  </div>
-
-  <!-- LEAVE BALANCE -->
-  <div class="settings-section">
-    <h3>📊 Leave Balance Allowance</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:13px">Default annual allowance per employee.</p>
-    <div class="two-col">
-      <div class="form-group"><label>Annual Leave (days)</label><input type="number" id="settingAnnual" placeholder="14" min="1" max="60"></div>
-      <div class="form-group"><label>Medical Leave (days)</label><input type="number" id="settingMedical" placeholder="14" min="1" max="60"></div>
-    </div>
-    <button class="btn-save" onclick="saveBalanceSettings()">Save Allowance</button>
-  </div>
-
-  <!-- DATA -->
-  <div class="settings-section">
-    <h3>🗑️ Data Management</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Permanently delete all leave request data. Cannot be undone.</p>
-    <button class="btn-danger" onclick="clearAllData()">Clear All Data</button>
-  </div>
-
-  <div class="settings-section">
-    <h3>ℹ️ About</h3>
-    <p style="font-size:13px;color:var(--muted);line-height:1.6">LeaveEasy v3.0 — Mobile-first leave management. Share the URL in your WhatsApp group so employees can apply anytime, anywhere.</p>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
 // ════════════════════════════════════
 // STATE  — Firebase-backed
 // ════════════════════════════════════
@@ -559,18 +336,10 @@ let _depts    = null;
 let _settings = null;
 let _period   = null;
 
-// ── Firestore helpers (wait for Firebase module to expose them) ──
-function db()         { return window._db; }
-function fsDoc(...a)  { return window._doc(...a); }
-function fsGet(ref)   { return window._getDoc(ref); }
-function fsSet(ref,d) { return window._setDoc(ref,d); }
-function fsColl(...a) { return window._collection(...a); }
-function fsGetAll(ref){ return window._getDocs(ref); }
-
 // ── CONFIG DOC helpers ──
 async function loadConfig() {
   try {
-    const snap = await fsGet(fsDoc(db(),'leaveEasyConfig','data'));
+    const snap = await getDoc(doc(db,'leaveEasyConfig','data'));
     if (snap.exists()) {
       const d = snap.data();
       _admins   = d.admins   || [{ id:1, name:'Admin', role:'System Admin', pin:'1234' }];
@@ -588,7 +357,7 @@ async function loadConfig() {
 }
 async function saveConfig() {
   try {
-    await fsSet(fsDoc(db(),'leaveEasyConfig','data'), {
+    await setDoc(doc(db,'leaveEasyConfig','data'), {
       admins:_admins, depts:_depts, settings:_settings, period:_period
     });
   } catch(e) { console.error('saveConfig error',e); }
@@ -597,7 +366,7 @@ async function saveConfig() {
 // ── REQUESTS helpers ──
 async function loadRequests() {
   try {
-    const snap = await fsGetAll(fsColl(db(),'leaveRequests'));
+    const snap = await getDocs(collection(db,'leaveRequests'));
     requests = snap.docs.map(d=>({...d.data(), _docId:d.id}));
     requests.sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));
   } catch(e) { console.error('loadRequests error',e); }
@@ -606,7 +375,7 @@ async function save() {
   // save() is called after requests.unshift() — save the newest request (first in array)
   const r = requests[0];
   try {
-    const ref = await window._addDoc(fsColl(db(),'leaveRequests'), r);
+    const ref = await addDoc(collection(db,'leaveRequests'), r);
     r._docId = ref.id;
   } catch(e) { console.error('save error',e); }
 }
@@ -615,7 +384,7 @@ async function saveRequest(r) {
   try {
     if (r._docId) {
       const {_docId,...data} = r;
-      await window._updateDoc(fsDoc(db(),'leaveRequests',r._docId), data);
+      await updateDoc(doc(db,'leaveRequests',r._docId), data);
     }
   } catch(e) { console.error('saveRequest error',e); }
 }
@@ -869,19 +638,6 @@ function updatePeriodPreview() {
 }
 
 
-function updateBalance() {
-  const name = document.getElementById('empName').value.trim().toLowerCase();
-  if (!name) return;
-  const s = getSettings();
-  const approved = requests.filter(r=>r.name.toLowerCase()===name && r.status==='Approved');
-  const annualUsed = approved.filter(r=>r.leaveType==='Full Day').length + approved.filter(r=>r.leaveType.startsWith('Half Day')).length*0.5;
-  const medUsed = approved.filter(r=>r.leaveType==='Medical').length;
-  const annLeft = Math.max(0, s.annual - annualUsed), medLeft = Math.max(0, s.medical - medUsed);
-  document.getElementById('balAnnual').textContent = annLeft + ' days left';
-  document.getElementById('balMedical').textContent = medLeft + ' days left';
-  document.getElementById('barAnnual').style.width = Math.round(annLeft/s.annual*100)+'%';
-  document.getElementById('barMedical').style.width = Math.round(medLeft/s.medical*100)+'%';
-}
 
 // ════════════════════════════════════
 // APPLY
@@ -894,24 +650,160 @@ function selectLeave(el, type) {
 async function submitLeave() {
   if (!isPeriodOpen()) { showToast('⛔ Leave applications are currently closed'); return; }
   const name=document.getElementById('empName').value.trim(), dept=document.getElementById('empDept').value;
+  const epf=document.getElementById('empEpf').value.trim(), phone=document.getElementById('empPhone').value.trim();
   const dateFrom=document.getElementById('dateFrom').value, dateTo=document.getElementById('dateTo').value;
   const reason=document.getElementById('reason').value.trim(), handover=document.getElementById('handover').value.trim();
   if (!name) { showToast('⚠️ Please enter your name'); return; }
+  if (!epf) { showToast('⚠️ EPF Number is required'); return; }
+  if (!phone) { showToast('⚠️ Telephone number is required'); return; }
   if (!dept) { showToast('⚠️ Please select your department'); return; }
   if (!selectedLeaveType) { showToast('⚠️ Please select leave type'); return; }
   if (!dateFrom) { showToast('⚠️ Please select a date'); return; }
   if (!reason) { showToast('⚠️ Please enter a reason'); return; }
-  if (!handover) { showToast('⚠️ Please fill in handover details'); return; }
+  // ── Overlap detection ──
+  const fromD = new Date(dateFrom + 'T00:00:00');
+  const toD   = dateTo ? new Date(dateTo + 'T00:00:00') : fromD;
+  const overlaps = requests.filter(r => {
+    if (r.epf !== epf) return false;
+    if (['Rejected','Cancelled'].includes(r.status)) return false;
+    const rFrom = new Date(r.dateFrom + 'T00:00:00');
+    const rTo   = r.dateTo ? new Date(r.dateTo + 'T00:00:00') : rFrom;
+    return fromD <= rTo && toD >= rFrom;
+  });
+  const warnEl = document.getElementById('overlapWarn');
+  if (overlaps.length) {
+    const ol = overlaps[0];
+    const olDs = ol.dateTo && ol.dateTo !== ol.dateFrom ? `${fmtDate(ol.dateFrom)} → ${fmtDate(ol.dateTo)}` : fmtDate(ol.dateFrom);
+    warnEl.innerHTML = `⚠️ <strong>Possible duplicate!</strong> You already have a <strong>${ol.leaveType}</strong> request (${olDs}) that overlaps these dates with status <strong>${ol.status}</strong>. Submit anyway?
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button onclick="forceSubmit()" style="flex:1;padding:8px;background:var(--warn);color:#0f1117;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer">Submit Anyway</button>
+        <button onclick="document.getElementById('overlapWarn').classList.remove('show')" style="flex:1;padding:8px;background:var(--surface2);color:var(--muted);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:12px;cursor:pointer">Cancel</button>
+      </div>`;
+    warnEl.classList.add('show');
+    return;
+  }
+  warnEl.classList.remove('show');
+  await doSubmit(name, dept, epf, phone, dateFrom, dateTo, reason, handover);
+}
+let _lastReceipt = null;
+
+function downloadReceiptPDF() {
+  if (!_lastReceipt) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a5', orientation: 'portrait' });
+  const r = _lastReceipt;
+  const W = doc.internal.pageSize.getWidth();
+
+  // Background
+  doc.setFillColor(15, 17, 23);
+  doc.rect(0, 0, W, doc.internal.pageSize.getHeight(), 'F');
+
+  // Header bar
+  doc.setFillColor(26, 29, 39);
+  doc.roundedRect(8, 8, W - 16, 22, 3, 3, 'F');
+  doc.setTextColor(74, 222, 128);
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('CBA LeaveEasy', 14, 21);
+  doc.setTextColor(180, 190, 210);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Submission Receipt', 14, 27);
+
+  // Ref badge
+  doc.setFillColor(74, 222, 128);
+  doc.roundedRect(W - 52, 12, 44, 13, 3, 3, 'F');
+  doc.setTextColor(15, 17, 23);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text(r.refId, W - 50, 20.5);
+
+  // Divider
+  doc.setDrawColor(46, 51, 71);
+  doc.setLineWidth(0.3);
+  doc.line(8, 34, W - 8, 34);
+
+  // Fields
+  const fields = [
+    ['Name', r.name],
+    ['EPF Number', r.epf],
+    ['Department', r.dept || '—'],
+    ['Telephone', r.phone || '—'],
+    ['Leave Type', r.leaveType + (r.hours ? ` (${r.hours}h)` : '')],
+    ['Date(s)', r.dateStr],
+    ['Reason', r.reason],
+    ['Status', 'Pending – Awaiting Admin Approval'],
+    ['Submitted At', new Date(r.submittedAt).toLocaleString('en-GB')],
+  ];
+
+  let y = 42;
+  fields.forEach(([label, value]) => {
+    doc.setFillColor(26, 29, 39);
+    doc.roundedRect(8, y - 4, W - 16, 12, 2, 2, 'F');
+
+    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.text(label.toUpperCase(), 13, y + 1);
+
+    doc.setTextColor(241, 245, 249);
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica', 'bold');
+    const valStr = String(value);
+    const maxW = W - 16 - 40;
+    const lines = doc.splitTextToSize(valStr, maxW);
+    doc.text(lines[0], W - 13, y + 1, { align: 'right' });
+
+    y += 14;
+  });
+
+  // Footer
+  doc.setFillColor(26, 29, 39);
+  doc.roundedRect(8, y + 2, W - 16, 14, 3, 3, 'F');
+  doc.setTextColor(100, 116, 139);
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Keep this receipt for your records.', W / 2, y + 11, { align: 'center' });
+
+  doc.save(`leave-receipt-${r.refId}.pdf`);
+  showToast('📄 Receipt downloaded!');
+}
+
+async function doSubmit(name, dept, epf, phone, dateFrom, dateTo, reason, handover) {
   const hours = selectedLeaveType==='Short Leave' ? document.getElementById('hoursNeeded').value : null;
-  requests.unshift({ id:Date.now(), name, dept, leaveType:selectedLeaveType, dateFrom, dateTo, reason, handover, hours, status:'Pending', submittedAt:new Date().toISOString() });
+  const refId = 'LV-' + Date.now().toString(36).toUpperCase().slice(-6);
+  const submittedAt = new Date().toISOString();
+  requests.unshift({ id:Date.now(), refId, name, epf, phone, dept, leaveType:selectedLeaveType, dateFrom, dateTo, reason, handover, hours, status:'Pending', submittedAt });
   await save();
+  document.getElementById('overlapWarn').classList.remove('show');
+  const ds = dateTo && dateTo !== dateFrom ? `${fmtDate(dateFrom)} → ${fmtDate(dateTo)}` : fmtDate(dateFrom);
+  _lastReceipt = { refId, name, epf, phone, dept, leaveType:selectedLeaveType, hours, dateStr:ds, reason, submittedAt };
+  document.getElementById('receiptContent').innerHTML = `
+    <div class="receipt-box">
+      <div class="receipt-title">📋 Submission Receipt</div>
+      <div class="receipt-row"><span class="rl">Ref ID</span><span class="rv receipt-ref">${refId}</span></div>
+      <div class="receipt-row"><span class="rl">Name</span><span class="rv">${name}</span></div>
+      <div class="receipt-row"><span class="rl">EPF</span><span class="rv">${epf}</span></div>
+      <div class="receipt-row"><span class="rl">Department</span><span class="rv">${dept||'—'}</span></div>
+      <div class="receipt-row"><span class="rl">Leave Type</span><span class="rv">${selectedLeaveType}${hours?' ('+hours+'h)':''}</span></div>
+      <div class="receipt-row"><span class="rl">Date(s)</span><span class="rv">${ds}</span></div>
+      <div class="receipt-row"><span class="rl">Status</span><span class="rv" style="color:var(--warn)">⏳ Pending</span></div>
+      <button onclick="downloadReceiptPDF()" style="width:100%;margin-top:12px;padding:10px;background:var(--accent2);color:#0f1117;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">⬇ Download Receipt PDF</button>
+    </div>`;
   document.getElementById('successBox').classList.add('visible');
   document.getElementById('applyForm').style.display = 'none';
+}
+function forceSubmit() {
+  const name=document.getElementById('empName').value.trim(), dept=document.getElementById('empDept').value;
+  const epf=document.getElementById('empEpf').value.trim(), phone=document.getElementById('empPhone').value.trim();
+  const dateFrom=document.getElementById('dateFrom').value, dateTo=document.getElementById('dateTo').value;
+  const reason=document.getElementById('reason').value.trim(), handover=document.getElementById('handover').value.trim();
+  doSubmit(name, dept, epf, phone, dateFrom, dateTo, reason, handover);
 }
 function resetForm() {
   document.getElementById('successBox').classList.remove('visible');
   document.getElementById('applyForm').style.display = 'block';
-  ['empName','dateTo','reason','handover'].forEach(id=>document.getElementById(id).value='');
+  ['empName','empEpf','empPhone','dateTo','reason','handover'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('empDept').value = '';
   document.getElementById('dateFrom').valueAsDate = new Date();
   document.querySelectorAll('.leave-card').forEach(c=>c.classList.remove('selected'));
@@ -927,34 +819,59 @@ function renderAdmin() {
   document.getElementById('statPending').textContent = requests.filter(r=>r.status==='Pending').length;
   document.getElementById('statApproved').textContent = requests.filter(r=>r.status==='Approved').length;
   document.getElementById('statTotal').textContent = requests.length;
-  const filtered = currentFilter==='all' ? requests : requests.filter(r=>r.status===currentFilter);
+  const searchQ = (document.getElementById('adminSearch')?.value||'').trim().toLowerCase();
+  let filtered = currentFilter==='all' ? requests : requests.filter(r=>r.status===currentFilter);
+  if (searchQ) filtered = filtered.filter(r=>(r.name||'').toLowerCase().includes(searchQ)||(r.epf||'').toString().toLowerCase().includes(searchQ));
   const container = document.getElementById('requestsList');
   if (!filtered.length) { container.innerHTML=`<div class="no-requests"><div class="big">📭</div><p>No ${currentFilter==='all'?'':currentFilter.toLowerCase()+' '}requests found</p></div>`; return; }
   container.innerHTML = filtered.map(r => {
     const ds = r.dateTo && r.dateTo!==r.dateFrom ? `${fmtDate(r.dateFrom)} → ${fmtDate(r.dateTo)}` : fmtDate(r.dateFrom);
-    const waMsg = encodeURIComponent(`Hi ${r.name},\n\nYour *${r.leaveType}* request for *${ds}* has been *${r.status}* ${r.status==='Approved'?'✅':'❌'}.\n\nThank you.\nAdmin`);
+    const waMsg = encodeURIComponent(`Hi ${r.name},\n\nYour *${r.leaveType}* request for *${ds}* has been *${r.status}* ${r.status==='Approved'?'✅':'❌'}.${r.rejectionNote?`\n\n*Reason:* ${r.rejectionNote}`:''}\n\nThank you.\nAdmin`);
     const actionBtns = r.status==='Pending'
-      ? `<button class="btn-approve" onclick="updateStatus(${r.id},'Approved')">✅ Approve</button><button class="btn-reject" onclick="updateStatus(${r.id},'Rejected')">❌ Reject</button><a href="https://wa.me/?text=${waMsg}" target="_blank"><button class="btn-wa">💬</button></a>`
+      ? `<button class="btn-approve" onclick="updateStatus(${r.id},'Approved')">✅ Approve</button><button class="btn-reject" onclick="openRejectModal(${r.id})">❌ Reject</button><a href="https://wa.me/?text=${waMsg}" target="_blank"><button class="btn-wa">💬</button></a>`
+      : r.status==='CancelRequested'
+      ? `<button class="btn-approve-cancel" onclick="adminActCancel(${r.id},'approve')">✅ Approve Cancel</button><button class="btn-reject-cancel" onclick="adminActCancel(${r.id},'reject')">↩ Keep Leave</button>`
       : `<a href="https://wa.me/?text=${waMsg}" target="_blank" style="flex:1"><button class="btn-wa" style="width:100%;border-radius:9px;padding:9px;border:none;background:rgba(37,211,102,0.1);color:#25d366;font-family:DM Sans,sans-serif;font-weight:600;font-size:12px;cursor:pointer">💬 Notify via WhatsApp</button></a>`;
     const actionedLine = r.approvedBy
       ? `<div class="approved-by">✅ Approved by <strong>${r.approvedBy}</strong>${r.approvedAt ? ' · '+timeAgo(r.approvedAt) : ''}</div>`
       : r.rejectedBy
-      ? `<div class="rejected-by">❌ Rejected by <strong>${r.rejectedBy}</strong>${r.rejectedAt ? ' · '+timeAgo(r.rejectedAt) : ''}</div>`
+      ? `<div class="rejected-by">❌ Rejected by <strong>${r.rejectedBy}</strong>${r.rejectedAt ? ' · '+timeAgo(r.rejectedAt) : ''}${r.rejectionNote ? `<div style="font-size:11px;margin-top:3px;color:var(--muted)">📝 ${r.rejectionNote}</div>` : ''}</div>`
+      : r.status==='CancelRequested'
+      ? `<div style="font-size:11px;color:var(--warn);background:rgba(251,146,60,0.1);border-radius:6px;padding:3px 8px;margin-top:4px;display:inline-block">⏳ Employee requested cancellation ${timeAgo(r.cancelRequestedAt)}</div>`
+      : r.cancelledAt
+      ? `<div style="font-size:11px;color:var(--purple);background:rgba(167,139,250,0.1);border-radius:6px;padding:3px 8px;margin-top:4px;display:inline-block">🚫 Cancelled by admin ${timeAgo(r.cancelledAt)}</div>`
       : '';
     return `<div class="request-card">
       <div class="req-header">
         <div><div class="req-name">${r.name}</div>${r.dept?`<div class="req-dept">${r.dept}</div>`:''}<div class="req-date">Submitted ${timeAgo(r.submittedAt)}</div></div>
-        <span class="badge ${r.status.toLowerCase()}">${r.status}</span>
+        ${statusBadge(r.status)}
       </div>
-      <div class="req-meta"><div class="meta-chip"><strong>${r.leaveType}</strong>${r.hours?` (${r.hours}h)`:''}</div><div class="meta-chip">📅 ${ds}</div></div>
+      <div class="req-meta"><div class="meta-chip"><strong>${r.leaveType}</strong>${r.hours?` (${r.hours}h)`:''}</div><div class="meta-chip">📅 ${ds}</div>${r.epf?`<div class="meta-chip">🪪 EPF: <strong style="color:var(--accent)">${r.epf}</strong></div>`:''} ${r.phone?`<div class="meta-chip">📞 ${r.phone}</div>`:''}</div>
       <div class="req-reason">💬 ${r.reason}</div>
-      <div class="req-handover"><span>Handover:</span> ${r.handover}</div>
+      ${r.handover?`<div class="req-handover"><span>Handover:</span> ${r.handover}</div>`:''}
       ${actionedLine}
       <div class="req-actions" style="margin-top:10px">${actionBtns}</div>
     </div>`;
   }).join('');
 }
-async function updateStatus(id, status) {
+let _rejectTargetId = null;
+function openRejectModal(id) {
+  _rejectTargetId = id;
+  document.getElementById('rejectNoteInput').value = '';
+  document.getElementById('rejectModal').classList.add('show');
+  setTimeout(() => document.getElementById('rejectNoteInput').focus(), 120);
+}
+function closeRejectModal() {
+  document.getElementById('rejectModal').classList.remove('show');
+  _rejectTargetId = null;
+}
+async function confirmReject() {
+  const note = document.getElementById('rejectNoteInput').value.trim();
+  await updateStatus(_rejectTargetId, 'Rejected', note);
+  closeRejectModal();
+}
+
+async function updateStatus(id, status, rejectionNote) {
   const r = requests.find(r=>r.id===id);
   if (r) {
     r.status = status;
@@ -967,6 +884,7 @@ async function updateStatus(id, status) {
       r.approvedBy = null;
       r.rejectedBy = admin ? admin.name : 'Admin';
       r.rejectedAt = new Date().toISOString();
+      r.rejectionNote = rejectionNote || '';
     }
     await saveRequest(r); renderAdmin(); showToast(status==='Approved'?'✅ Leave approved!':'❌ Leave rejected');
   }
@@ -1059,9 +977,19 @@ function searchEmployee() {
   const q=document.getElementById('empSearch').value.trim().toLowerCase();
   const drop=document.getElementById('empDrop');
   if (!q) { drop.classList.remove('show'); return; }
-  const names=[...new Set(requests.map(r=>r.name))].filter(n=>n.toLowerCase().includes(q));
-  if (!names.length) { drop.classList.remove('show'); return; }
-  drop.innerHTML=names.map(n=>{ const dept=requests.find(r=>r.name===n)?.dept||''; return `<div class="emp-option" onclick="selectEmployee('${n.replace(/'/g,"\\'")}')"><div>${n}</div>${dept?`<div class="opt-dept">${dept}</div>`:''}</div>`; }).join('');
+  const seen=new Set(); const matches=[];
+  requests.forEach(r=>{
+    if(seen.has(r.name)) return;
+    const nameMatch=r.name.toLowerCase().includes(q);
+    const epfMatch=r.epf && r.epf.toString().toLowerCase().includes(q);
+    if(nameMatch||epfMatch){ seen.add(r.name); matches.push(r); }
+  });
+  if (!matches.length) { drop.classList.remove('show'); return; }
+  drop.innerHTML=matches.map(r=>{
+    const dept=r.dept||'';
+    const epfTag=r.epf?`<span style="font-size:10px;background:rgba(74,222,128,0.12);color:var(--accent);border-radius:4px;padding:1px 6px;margin-left:6px;font-weight:600">EPF: ${r.epf}</span>`:'';
+    return `<div class="emp-option" onclick="selectEmployee('${r.name.replace(/'/g,"\\'")}')"><div style="display:flex;align-items:center;flex-wrap:wrap;gap:2px">${r.name}${epfTag}</div>${dept?`<div class="opt-dept">${dept}${r.phone?' · 📞 '+r.phone:''}</div>`:r.phone?`<div class="opt-dept">📞 ${r.phone}</div>`:''}</div>`;
+  }).join('');
   drop.classList.add('show');
 }
 function selectEmployee(name) {
@@ -1069,8 +997,11 @@ function selectEmployee(name) {
   document.getElementById('empDrop').classList.remove('show');
   const empReqs=requests.filter(r=>r.name===name).sort((a,b)=>new Date(b.dateFrom)-new Date(a.dateFrom));
   const dept=empReqs[0]?.dept||'—';
+  const epf=empReqs[0]?.epf||'';
+  const phone=empReqs[0]?.phone||'';
   const hdr=document.getElementById('histHeader'); hdr.classList.add('show');
   hdr.innerHTML=`<div class="hist-name">${name}</div><div class="hist-dept">${dept}</div>
+    ${(epf||phone)?`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">${epf?`<span style="font-size:12px;background:rgba(74,222,128,0.1);color:var(--accent);border-radius:7px;padding:4px 10px;font-weight:600">🪪 EPF: ${epf}</span>`:''}${phone?`<span style="font-size:12px;background:var(--surface2);color:var(--text);border-radius:7px;padding:4px 10px">📞 ${phone}</span>`:''}</div>`:''}
     <div class="hist-stats">
       <div class="hist-stat"><div class="hist-stat-num" style="color:var(--accent)">${empReqs.filter(r=>r.status==='Approved').length}</div><div class="hist-stat-lbl">Approved</div></div>
       <div class="hist-stat"><div class="hist-stat-num" style="color:var(--warn)">${empReqs.filter(r=>r.status==='Pending').length}</div><div class="hist-stat-lbl">Pending</div></div>
@@ -1092,34 +1023,46 @@ function populateWeeks() {
   requests.forEach(r=>{ const d=new Date(r.dateFrom+'T00:00:00'),mon=new Date(d); mon.setDate(d.getDate()-((d.getDay()+6)%7)); weeks.add(mon.toISOString().split('T')[0]); });
   [...weeks].sort().reverse().forEach(w=>{ const end=new Date(w+'T00:00:00'); end.setDate(end.getDate()+6); const opt=document.createElement('option'); opt.value=w; opt.textContent=`${fmtDate(w)} – ${fmtDate(end.toISOString().split('T')[0])}`; sel.appendChild(opt); });
   if (cur) sel.value=cur;
+  // populate employee dropdown
+  const empSel=document.getElementById('empFilterSelect'); if(!empSel) return;
+  const curEmp=empSel.value;
+  empSel.innerHTML='<option value="all">All Employees</option>';
+  const empMap=new Map();
+  requests.forEach(r=>{ if(r.name && !empMap.has(r.name)) empMap.set(r.name, r.epf||''); });
+  [...empMap.entries()].sort((a,b)=>a[0].localeCompare(b[0])).forEach(([name,epf])=>{ const opt=document.createElement('option'); opt.value=name; opt.textContent=epf?`${name} (EPF: ${epf})`:name; empSel.appendChild(opt); });
+  if (curEmp) empSel.value=curEmp;
 }
 function renderReport() {
   const week=document.getElementById('weekSelect').value;
+  const empFilter=(document.getElementById('empFilterSelect')?.value)||'all';
+  const searchQ=(document.getElementById('reportSearch')?.value||'').trim().toLowerCase();
   let filtered=requests;
-  if (week!=='all') { const start=new Date(week+'T00:00:00'),end=new Date(week+'T00:00:00'); end.setDate(end.getDate()+6); filtered=requests.filter(r=>{ const d=new Date(r.dateFrom+'T00:00:00'); return d>=start&&d<=end; }); }
+  if (week!=='all') { const start=new Date(week+'T00:00:00'),end=new Date(week+'T00:00:00'); end.setDate(end.getDate()+6); filtered=filtered.filter(r=>{ const d=new Date(r.dateFrom+'T00:00:00'); return d>=start&&d<=end; }); }
+  if (empFilter!=='all') { filtered=filtered.filter(r=>r.name===empFilter); }
+  if (searchQ) { filtered=filtered.filter(r=>(r.name||'').toLowerCase().includes(searchQ)||(r.epf||'').toLowerCase().includes(searchQ)||(r.dept||'').toLowerCase().includes(searchQ)||(r.reason||'').toLowerCase().includes(searchQ)); }
   const body=document.getElementById('reportBody');
-  if (!filtered.length) { body.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:26px">No records for this period</td></tr>`; return; }
+  if (!filtered.length) { body.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:26px">No records found</td></tr>`; return; }
   body.innerHTML=filtered.map(r=>{ const ds=r.dateTo&&r.dateTo!==r.dateFrom?`${fmtDate(r.dateFrom)}–${fmtDate(r.dateTo)}`:fmtDate(r.dateFrom); const color=r.status==='Approved'?'var(--accent)':r.status==='Rejected'?'var(--danger)':'var(--warn)'; const actioned=r.approvedBy?r.approvedBy:r.rejectedBy?r.rejectedBy:'—'; return `<tr><td style="font-weight:700">${r.name}</td><td style="color:var(--accent2)">${r.dept||'—'}</td><td>${r.leaveType}${r.hours?` (${r.hours}h)`:''}</td><td style="white-space:nowrap">${ds}</td><td style="color:${color};font-weight:700">${r.status}</td><td style="color:var(--muted)">${actioned}</td><td style="color:var(--muted)">${r.reason}</td></tr>`; }).join('');
 }
 function exportCSV() {
   if (!requests.length) { showToast('⚠️ No data to export'); return; }
   const week=document.getElementById('weekSelect').value;
+  const empFilter=(document.getElementById('empFilterSelect')?.value)||'all';
   let filtered=requests;
-  if (week!=='all') { const start=new Date(week+'T00:00:00'),end=new Date(week+'T00:00:00'); end.setDate(end.getDate()+6); filtered=requests.filter(r=>{ const d=new Date(r.dateFrom+'T00:00:00'); return d>=start&&d<=end; }); }
-  const rows=[['Name','Department','Leave Type','Hours','Date From','Date To','Reason','Handover','Status','Actioned By','Submitted At']];
-  filtered.forEach(r=>rows.push([r.name,r.dept||'',r.leaveType,r.hours||'',r.dateFrom,r.dateTo||'',r.reason,r.handover,r.status,r.approvedBy||r.rejectedBy||'',r.submittedAt]));
+  if (week!=='all') { const start=new Date(week+'T00:00:00'),end=new Date(week+'T00:00:00'); end.setDate(end.getDate()+6); filtered=filtered.filter(r=>{ const d=new Date(r.dateFrom+'T00:00:00'); return d>=start&&d<=end; }); }
+  if (empFilter!=='all') { filtered=filtered.filter(r=>r.name===empFilter); }
+  const rows=[['Name','EPF Number','Telephone','Department','Leave Type','Hours','Date From','Date To','Reason','Handover','Status','Actioned By','Submitted At']];
+  filtered.forEach(r=>rows.push([r.name,r.epf||'',r.phone||'',r.dept||'',r.leaveType,r.hours||'',r.dateFrom,r.dateTo||'',r.reason,r.handover||'',r.status,r.approvedBy||r.rejectedBy||'',r.submittedAt]));
   const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download=`leave-report-${week==='all'?'all':week}.csv`; a.click();
-  showToast('📊 CSV exported for HR!');
+  const empSlug=empFilter!=='all'?`-${empFilter.replace(/\s+/g,'_')}`:''
+  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download=`leave-report-${week==='all'?'all':week}${empSlug}.csv`; a.click();
+  showToast('📊 CSV exported!');
 }
 
 // ════════════════════════════════════
 // SETTINGS
 // ════════════════════════════════════
 function loadSettings() {
-  const s=getSettings();
-  document.getElementById('settingAnnual').value=s.annual;
-  document.getElementById('settingMedical').value=s.medical;
   renderAdminList();
   renderDeptTags();
   loadPeriodSettings();
@@ -1191,18 +1134,11 @@ async function removeDept(name) {
   showToast('🗑️ Department removed');
 }
 
-async function saveBalanceSettings() {
-  const annual=parseInt(document.getElementById('settingAnnual').value)||14;
-  const medical=parseInt(document.getElementById('settingMedical').value)||14;
-  _settings = {annual,medical};
-  await saveConfig();
-  showToast('✅ Leave allowance saved!');
-}
 async function clearAllData() {
   if (!confirm('Are you sure? This will permanently delete ALL leave data and cannot be undone.')) return;
   try {
-    const snap = await fsGetAll(fsColl(db(),'leaveRequests'));
-    for (const d of snap.docs) await window._deleteDoc(window._doc(db(),'leaveRequests',d.id));
+    const snap = await getDocs(collection(db,'leaveRequests'));
+    for (const d of snap.docs) await deleteDoc(doc(db,'leaveRequests',d.id));
     requests=[]; renderAdmin(); showToast('🗑️ All data cleared.');
   } catch(e) { showToast('⚠️ Error clearing data'); console.error(e); }
 }
@@ -1212,16 +1148,441 @@ async function clearAllData() {
 // ════════════════════════════════════
 function fmtDate(str) { if(!str)return''; return new Date(str+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
 function timeAgo(iso) { const s=(Date.now()-new Date(iso))/1000; if(s<60)return'just now'; if(s<3600)return Math.floor(s/60)+'m ago'; if(s<86400)return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+function statusBadge(status) { const labels={CancelRequested:'⏳ Cancel Req.'}; const lbl=labels[status]||status; return `<span class="badge ${status.toLowerCase()}">${lbl}</span>`; }
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
 
 // ════════════════════════════════════
-// INIT — wait for Firebase then load
+// EPF SELF-LOOKUP (Apply page)
 // ════════════════════════════════════
-if (window._firebaseReady) {
-  initApp();
-} else {
-  document.addEventListener('firebaseReady', initApp);
+function lookupByEpf() {
+  const epfVal = document.getElementById('lookupEpfInput').value.trim();
+  const resultsEl = document.getElementById('epfResults');
+  if (!epfVal) { showToast('⚠️ Enter your EPF number'); return; }
+  const empReqs = requests.filter(r => r.epf && r.epf.toString().trim() === epfVal)
+                          .sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));
+  if (!empReqs.length) {
+    resultsEl.innerHTML = `<div class="epf-no-results">😕 No records found for EPF <strong style="color:var(--text)">${epfVal}</strong>.<br><span style="font-size:11px">Check your number or contact HR.</span></div>`;
+    resultsEl.classList.add('show');
+    return;
+  }
+  const emp = empReqs[0];
+  const approved = empReqs.filter(r=>r.status==='Approved').length;
+  const pending  = empReqs.filter(r=>r.status==='Pending').length;
+  const cancelled= empReqs.filter(r=>r.status==='Cancelled').length;
+
+  const cards = empReqs.map(r => {
+    const ds = r.dateTo && r.dateTo !== r.dateFrom ? `${fmtDate(r.dateFrom)} → ${fmtDate(r.dateTo)}` : fmtDate(r.dateFrom);
+    const statusBadgeHtml = statusBadge(r.status);
+    const actionedLine = r.approvedBy
+      ? `<div class="approved-by" style="margin-top:4px">✅ Approved by ${r.approvedBy}</div>`
+      : r.rejectedBy
+      ? `<div class="rejected-by" style="margin-top:4px">❌ Rejected by ${r.rejectedBy}${r.rejectionNote ? `<div style="font-size:11px;margin-top:3px;color:var(--muted)">📝 ${r.rejectionNote}</div>` : ''}</div>`
+      : r.status==='CancelRequested'
+      ? `<div style="font-size:11px;color:var(--warn);margin-top:4px">⏳ Cancellation awaiting admin approval</div>`
+      : r.cancelledAt
+      ? `<div style="font-size:11px;color:var(--purple);margin-top:4px">🚫 Cancelled ${timeAgo(r.cancelledAt)}</div>`
+      : '';
+    const cancelBtn = r.status === 'Pending'
+      ? `<button class="btn-cancel-req" onclick="cancelRequest(${r.id},'${epfVal}')">🚫 Request Cancel</button>`
+      : r.status === 'CancelRequested'
+      ? `<button class="btn-cancel-req" style="opacity:0.5;cursor:default" disabled>⏳ Pending Admin</button>`
+      : '';
+    return `<div class="epf-req-card" id="epf-req-${r.id}">
+      <div class="epf-req-top">
+        <div>
+          <div class="epf-req-type">${r.leaveType}${r.hours?` (${r.hours}h)`:''}</div>
+          <div class="epf-req-date">📅 ${ds} · <span style="color:var(--muted);font-size:10px">submitted ${timeAgo(r.submittedAt)}</span></div>
+        </div>
+        ${statusBadgeHtml}
+      </div>
+      <div class="epf-req-reason">💬 ${r.reason}</div>
+      <div class="epf-req-footer">${actionedLine}<div style="margin-left:auto">${cancelBtn}</div></div>
+    </div>`;
+  }).join('');
+
+  resultsEl.innerHTML = `
+    <div class="epf-results-header">
+      <div class="epf-results-name">${emp.name}</div>
+      <div class="epf-results-dept">${emp.dept||''}${emp.phone?` · 📞 ${emp.phone}`:''}</div>
+      <div class="epf-results-stats">
+        <div class="epf-results-stat"><div class="epf-results-stat-num" style="color:var(--accent)">${approved}</div><div class="epf-results-stat-lbl">Approved</div></div>
+        <div class="epf-results-stat"><div class="epf-results-stat-num" style="color:var(--warn)">${pending}</div><div class="epf-results-stat-lbl">Pending</div></div>
+        <div class="epf-results-stat"><div class="epf-results-stat-num" style="color:var(--accent2)">${empReqs.length}</div><div class="epf-results-stat-lbl">Total</div></div>
+      </div>
+    </div>
+    ${cards}`;
+  resultsEl.classList.add('show');
 }
+
+async function cancelRequest(id, epfVal) {
+  if (!confirm('Request cancellation of this leave? Admin will need to approve it.')) return;
+  const r = requests.find(r => r.id === id);
+  if (!r) { showToast('⚠️ Request not found'); return; }
+  if (r.status !== 'Pending') { showToast('⚠️ Only Pending requests can be cancelled'); return; }
+  r.status = 'CancelRequested';
+  r.cancelRequestedAt = new Date().toISOString();
+  await saveRequest(r);
+  showToast('⏳ Cancellation request sent to admin.');
+  lookupByEpf();
+  if (document.getElementById('page-admin').classList.contains('active')) renderAdmin();
+}
+
+async function adminActCancel(id, action) {
+  const r = requests.find(r => r.id === id);
+  if (!r) { showToast('⚠️ Request not found'); return; }
+  if (r.status !== 'CancelRequested') { showToast('⚠️ Not a cancellation request'); return; }
+  const admin = getAdmins().find(a => a.id === currentAdminId);
+  if (action === 'approve') {
+    r.status = 'Cancelled';
+    r.cancelledAt = new Date().toISOString();
+    r.cancelledBy = admin ? admin.name : 'Admin';
+    showToast('🚫 Cancellation approved.');
+  } else {
+    r.status = 'Pending';
+    r.cancelRequestedAt = null;
+    showToast('↩ Leave restored to Pending.');
+  }
+  await saveRequest(r);
+  renderAdmin();
+}
+// ════════════════════════════════════
+// INIT
+// ════════════════════════════════════
+initApp();
+
+// ── Expose all functions to window so onclick= works in HTML ──
+window.lookupByEpf       = lookupByEpf;
+window.cancelRequest     = cancelRequest;
+window.adminActCancel    = adminActCancel;
+window.showPage          = showPage;
+window.selectLeave       = selectLeave;
+window.submitLeave       = submitLeave;
+window.forceSubmit       = forceSubmit;
+window.resetForm         = resetForm;
+window.updateStatus      = updateStatus;
+window.openRejectModal   = openRejectModal;
+window.closeRejectModal  = closeRejectModal;
+window.confirmReject     = confirmReject;
+window.filterRequests    = filterRequests;
+window.changeMonth       = changeMonth;
+window.showDayDetail     = showDayDetail;
+window.searchEmployee    = searchEmployee;
+window.selectEmployee    = selectEmployee;
+window.populateWeeks     = populateWeeks;
+window.renderReport      = renderReport;
+window.exportCSV         = exportCSV;
+window.addAdmin          = addAdmin;
+window.removeAdmin       = removeAdmin;
+window.addDept           = addDept;
+window.removeDept        = removeDept;
+window.clearAllData      = clearAllData;
+window.togglePeriodEnabled = togglePeriodEnabled;
+window.savePeriod        = savePeriod;
+window.updatePeriodPreview = updatePeriodPreview;
+window.checkPin          = checkPin;
+window.backToAdminSelect = backToAdminSelect;
+window.pickAdmin         = pickAdmin;
+window.renderAdmin       = renderAdmin;
+window.downloadReceiptPDF = downloadReceiptPDF;
+
 </script>
-</body>
+</head>
+<body>
+
+<!-- PIN OVERLAY -->
+<div class="pin-overlay" id="pinOverlay">
+  <div class="pin-box">
+    <div style="font-size:32px;margin-bottom:10px">🔐</div>
+    <h2>Admin Access</h2>
+    <p id="pinPromptText">Select an admin account</p>
+
+    <!-- Step 1: pick admin -->
+    <div class="admin-select-list" id="adminSelectList"></div>
+
+    <!-- Step 2: enter PIN -->
+    <div id="pinStep" style="display:none">
+      <div style="font-size:12px;color:var(--accent2);margin-bottom:14px;font-weight:600" id="selectedAdminLabel"></div>
+      <div class="pin-input">
+        <input type="password" maxlength="1" id="p1" inputmode="numeric">
+        <input type="password" maxlength="1" id="p2" inputmode="numeric">
+        <input type="password" maxlength="1" id="p3" inputmode="numeric">
+        <input type="password" maxlength="1" id="p4" inputmode="numeric">
+      </div>
+      <p class="pin-error" id="pinError">❌ Incorrect PIN. Try again.</p>
+      <button class="btn-pin" onclick="checkPin()">Unlock →</button>
+      <div style="margin-top:10px"><button onclick="backToAdminSelect()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">← Back</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">CBA Leave<span>Easy</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" id="tab-apply" onclick="showPage('apply')">Apply</button>
+    <button class="nav-tab" id="tab-calendar" onclick="showPage('calendar',true)">📅 Calendar</button>
+    <button class="nav-tab" id="tab-admin" onclick="showPage('admin',true)">Admin</button>
+    <button class="nav-tab" id="tab-history" onclick="showPage('history',true)">History</button>
+    <button class="nav-tab" id="tab-report" onclick="showPage('report',true)">Report</button>
+    <button class="nav-tab" id="tab-settings" onclick="showPage('settings',true)">⚙️</button>
+  </div>
+</nav>
+
+<!-- ═══════════ APPLY ═══════════ -->
+<div class="page active" id="page-apply">
+  <h1>Apply Leave 🗓️</h1>
+  <p class="subtitle">Fill in the details. Your request will be sent to admin for review.</p>
+
+  <div id="periodBanner"></div>
+
+  <!-- EPF SELF-LOOKUP -->
+  <div class="epf-lookup-section">
+    <h3>🔍 Check Your Leave Status</h3>
+    <p>Enter your EPF number to view your leave history and cancel a pending request.</p>
+    <div class="epf-lookup-row">
+      <input type="text" id="lookupEpfInput" placeholder="Your EPF number" inputmode="numeric" autocomplete="off" onkeydown="if(event.key==='Enter')lookupByEpf()">
+      <button class="btn-lookup" onclick="lookupByEpf()">Check →</button>
+    </div>
+    <div class="epf-results" id="epfResults"></div>
+  </div>
+
+
+  <div class="success-box" id="successBox">
+    <div class="success-icon">✅</div>
+    <h3>Request Submitted!</h3>
+    <p>Your leave request has been sent for approval.<br>You'll be notified once reviewed.</p>
+    <div id="receiptContent"></div>
+    <button class="btn-new" onclick="resetForm()">+ New Request</button>
+  </div>
+
+  <div id="applyForm">
+    <div class="form-group">
+      <label>Your Full Name</label>
+      <input type="text" id="empName" placeholder="Enter your full name" autocomplete="name">
+    </div>
+    <div class="two-col">
+      <div class="form-group">
+        <label>EPF Number <span style="color:var(--danger)">*</span></label>
+        <input type="text" id="empEpf" placeholder="e.g. 123456" inputmode="numeric" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Telephone <span style="color:var(--danger)">*</span></label>
+        <input type="tel" id="empPhone" placeholder="e.g. 0771234567" autocomplete="tel">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Department</label>
+      <select id="empDept"><option value="">— Select Department —</option></select>
+    </div>
+    <div class="form-group">
+      <label>Leave Type</label>
+      <div class="leave-types">
+        <div class="leave-card" onclick="selectLeave(this,'Full Day')"><div class="icon">🌙</div><div class="lbl">Full Day</div><div class="desc">Entire day off</div></div>
+        <div class="leave-card" onclick="selectLeave(this,'Half Day AM')"><div class="icon">🌅</div><div class="lbl">Half Day AM</div><div class="desc">Morning off</div></div>
+        <div class="leave-card" onclick="selectLeave(this,'Half Day PM')"><div class="icon">🌇</div><div class="lbl">Half Day PM</div><div class="desc">Afternoon off</div></div>
+        <div class="leave-card" onclick="selectLeave(this,'Short Leave')"><div class="icon">⏱️</div><div class="lbl">Short Leave</div><div class="desc">Few hours only</div></div>
+        <div class="leave-card" onclick="selectLeave(this,'Medical Leave')"><div class="icon">🏥</div><div class="lbl">Medical Leave</div><div class="desc">Sick / doctor visit</div></div>
+      </div>
+    </div>
+    <div class="form-group hours-row" id="hoursRow">
+      <label>Hours Needed</label>
+      <select id="hoursNeeded">
+        <option value="1">1 hour</option><option value="1.5">1.5 hours</option>
+        <option value="2">2 hours</option><option value="2.5">2.5 hours</option><option value="3">3 hours</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Leave Date(s)</label>
+      <div class="two-col"><input type="date" id="dateFrom"><input type="date" id="dateTo"></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:5px">Leave end date empty if single day</div>
+    </div>
+    <div class="form-group"><label>Reason</label><textarea id="reason" placeholder="e.g. Medical appointment, family matter..."></textarea></div>
+    <div class="form-group"><label>Handover / Coverage Plan <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><textarea id="handover" placeholder="Who will cover your work? Any tasks to handover?"></textarea></div>
+    <div class="overlap-warn" id="overlapWarn"></div>
+    <button class="btn-submit" id="submitBtn" onclick="submitLeave()">Submit Request →</button>
+  </div>
+</div>
+
+<!-- ═══════════ CALENDAR ═══════════ -->
+<div class="page" id="page-calendar">
+  <h1>Leave Calendar 📅</h1>
+  <p class="subtitle">Full monthly view — tap any date to see details.</p>
+  <div class="cal-nav no-print">
+    <button class="cal-btn" onclick="changeMonth(-1)">‹</button>
+    <h2 id="calMonthLabel"></h2>
+    <button class="cal-btn" onclick="changeMonth(1)">›</button>
+  </div>
+  <div class="cal-legend">
+    <div class="leg-item"><div class="leg-dot" style="background:rgba(74,222,128,0.3)"></div>Approved</div>
+    <div class="leg-item"><div class="leg-dot" style="background:rgba(251,146,60,0.3)"></div>Pending</div>
+    <div class="leg-item"><div class="leg-dot" style="background:rgba(248,113,113,0.2)"></div>Rejected</div>
+  </div>
+  <div class="cal-grid">
+    <div class="cal-header-row">
+      <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+    </div>
+    <div class="cal-body" id="calBody"></div>
+  </div>
+  <!-- Day detail panel shown below calendar -->
+  <div class="day-detail-panel" id="dayDetailPanel">
+    <div class="ddp-title" id="ddpTitle"></div>
+    <div id="ddpRows"></div>
+  </div>
+</div>
+
+<!-- ═══════════ ADMIN ═══════════ -->
+<div class="page" id="page-admin">
+  <h1>Admin Panel 🛡️</h1>
+  <p class="subtitle" id="adminWelcome">Review leave requests.</p>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num orange" id="statPending">0</div><div class="stat-label">Pending</div></div>
+    <div class="stat-card"><div class="stat-num green" id="statApproved">0</div><div class="stat-label">Approved</div></div>
+    <div class="stat-card"><div class="stat-num blue" id="statTotal">0</div><div class="stat-label">Total</div></div>
+  </div>
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterRequests('all',this)">All</button>
+    <button class="filter-tab" onclick="filterRequests('Pending',this)">⏳ Pending</button>
+    <button class="filter-tab" onclick="filterRequests('CancelRequested',this)">🚫 Cancel Req.</button>
+    <button class="filter-tab" onclick="filterRequests('Approved',this)">✅ Approved</button>
+    <button class="filter-tab" onclick="filterRequests('Rejected',this)">❌ Rejected</button>
+    <button class="filter-tab" onclick="filterRequests('Cancelled',this)">🗑 Cancelled</button>
+  </div>
+  <div class="admin-search-wrap">
+    <input type="text" id="adminSearch" placeholder="🔍  Search by name or EPF…" oninput="renderAdmin()" autocomplete="off">
+  </div>
+  <div id="requestsList"></div>
+</div>
+
+<!-- ═══════════ HISTORY ═══════════ -->
+<div class="page" id="page-history">
+  <h1>Employee History 👤</h1>
+  <p class="subtitle">Search by name or EPF number to view an employee's full leave record.</p>
+  <div class="emp-search-wrap">
+    <input type="text" id="empSearch" placeholder="🔍  Search by name or EPF number..." oninput="searchEmployee()" autocomplete="off">
+    <div class="emp-list-drop" id="empDrop"></div>
+  </div>
+  <div class="history-header" id="histHeader"></div>
+  <div id="histList"></div>
+</div>
+
+<!-- ═══════════ REPORT ═══════════ -->
+<div class="page" id="page-report">
+  <div class="report-header">
+    <div><h1>HR Report 📊</h1><p class="subtitle" style="margin-bottom:0">Weekly leave summary</p></div>
+    <div class="report-btns no-print">
+      <button class="btn-export" onclick="exportCSV()">⬇ CSV</button>
+    </div>
+  </div>
+  <div class="week-selector no-print">
+    <span class="week-label">Period:</span>
+    <select id="weekSelect"><option value="all">All Time</option></select>
+  </div>
+  <div class="week-selector no-print" id="empFilterWrap" style="margin-top:-8px">
+    <span class="week-label">Employee:</span>
+    <select id="empFilterSelect"><option value="all">All Employees</option></select>
+  </div>
+  <div class="admin-search-wrap no-print" style="margin-bottom:10px;display:flex;gap:8px;">
+    <input type="text" id="reportSearch" placeholder="🔍  Search name, EPF, dept, reason…" style="flex:1;font-size:13px;padding:10px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;color:var(--text);" autocomplete="off" onkeydown="if(event.key==='Enter')renderReport()">
+    <button onclick="renderReport()" style="padding:10px 18px;background:var(--accent2);color:#0f1117;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;">Search</button>
+  </div>
+  <div class="report-wrap">
+    <table class="report-table">
+      <thead><tr><th>Name</th><th>Dept</th><th>Type</th><th>Date</th><th>Status</th><th>Actioned By</th><th>Reason</th></tr></thead>
+      <tbody id="reportBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════ SETTINGS ═══════════ -->
+<div class="page" id="page-settings">
+  <h1>Settings ⚙️</h1>
+  <p class="subtitle">Configure the app for your organisation.</p>
+
+  <!-- ADMINS -->
+  <div class="settings-section">
+    <h3>👥 Admin Accounts</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:13px">Each admin has their own name and PIN. You must be logged in as an existing admin to make changes.</p>
+    <div class="admin-list" id="adminList"></div>
+    <div class="add-admin-form">
+      <h4>➕ Add New Admin</h4>
+      <div class="form-group"><label>Admin Name</label><input type="text" id="newAdminName" placeholder="e.g. Sarah (HR)"></div>
+      <div class="form-group"><label>Role / Title</label><input type="text" id="newAdminRole" placeholder="e.g. HR Manager"></div>
+      <div class="two-col">
+        <div class="form-group"><label>PIN</label><input type="password" id="newAdminPin" placeholder="4 digits" maxlength="4" inputmode="numeric"></div>
+        <div class="form-group"><label>Confirm PIN</label><input type="password" id="newAdminPinConfirm" placeholder="Repeat" maxlength="4" inputmode="numeric"></div>
+      </div>
+      <button class="btn-save" onclick="addAdmin()">Add Admin</button>
+    </div>
+  </div>
+
+  <!-- DEPARTMENTS -->
+  <div class="settings-section">
+    <h3>🏢 Departments</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Add or remove department names used in the Apply form.</p>
+    <div class="dept-tags" id="deptTags"></div>
+    <div class="add-dept-row">
+      <input type="text" id="newDeptInput" placeholder="New department name" maxlength="40" onkeydown="if(event.key==='Enter')addDept()">
+      <button class="btn-add" onclick="addDept()">Add</button>
+    </div>
+  </div>
+
+  <!-- LEAVE PERIOD -->
+  <div class="settings-section">
+    <h3>⏰ Application Time Window</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Set the daily hours when employees <strong style="color:var(--text)">cannot</strong> submit leave requests. Outside these blocked hours, applications are open. Leave both empty to allow anytime.</p>
+
+    <!-- Toggle -->
+    <div class="toggle-row" id="periodToggleRow">
+      <span style="font-size:13px;font-weight:600">Enable blocked hours</span>
+      <div class="toggle-switch" id="periodToggle" onclick="togglePeriodEnabled()">
+        <div class="toggle-knob" id="periodKnob"></div>
+      </div>
+    </div>
+
+    <div id="periodFields" style="margin-top:14px">
+      <div class="two-col">
+        <div class="form-group">
+          <label>Block From</label>
+          <input type="time" id="blockFrom" value="00:00" oninput="updatePeriodPreview()">
+        </div>
+        <div class="form-group">
+          <label>Block Until</label>
+          <input type="time" id="blockTo" value="06:00" oninput="updatePeriodPreview()">
+        </div>
+      </div>
+      <div class="period-preview" id="periodPreview"></div>
+      <button class="btn-save" onclick="savePeriod()">Save Time Window</button>
+    </div>
+  </div>
+
+  <!-- DATA -->
+  <div class="settings-section">
+    <h3>🗑️ Data Management</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Permanently delete all leave request data. Cannot be undone.</p>
+    <button class="btn-danger" onclick="clearAllData()">Clear All Data</button>
+  </div>
+
+  <div class="settings-section">
+    <h3>ℹ️ About</h3>
+    <p style="font-size:13px;color:var(--muted);line-height:1.6">CBA Leave Easy v3.0 — Mobile-first leave management. Share the URL in your WhatsApp group so employees can apply anytime, anywhere.</p>
+  </div>
+</div>
+
+<!-- REJECTION NOTE MODAL -->
+<div class="modal-overlay" id="rejectModal">
+  <div class="modal-box">
+    <div style="font-size:28px;margin-bottom:10px">❌</div>
+    <h3>Reject Leave Request</h3>
+    <p>Add a reason for rejection. This will be included in the WhatsApp notification to the employee.</p>
+    <textarea id="rejectNoteInput" placeholder="e.g. Insufficient staff coverage on requested dates, please reapply for alternate dates."></textarea>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeRejectModal()">Cancel</button>
+      <button class="btn-modal-confirm" onclick="confirmReject()">Confirm Reject</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
 </html>
