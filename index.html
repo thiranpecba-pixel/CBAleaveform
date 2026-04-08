@@ -21,7 +21,7 @@ body.light {
 }
 
 /* Theme toggle button */
-.theme-toggle{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-size:16px;transition:all 0.25s;flex-shrink:0;margin-left:6px;}
+.theme-toggle{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-size:16px;transition:all 0.25s;flex-shrink:0;margin-left:8px;}
 .theme-toggle:hover{border-color:var(--accent);transform:rotate(20deg) scale(1.1);}
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -1515,7 +1515,6 @@ applyTheme(localStorage.getItem('cba-theme') || 'dark');
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-logo"><div style="line-height:1">CBA</div><div style="font-size:0.72rem;letter-spacing:0.5px;margin-top:1px">Leave</div><div style="font-size:0.72rem;letter-spacing:0.5px;margin-top:1px">Easy</div></div>
-  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
   <div class="nav-tabs">
     <button class="nav-tab active" id="tab-apply" onclick="showPage('apply')">Apply</button>
     <button class="nav-tab" id="tab-calendar" onclick="showPage('calendar',true)">📅 Calendar</button>
@@ -1524,6 +1523,7 @@ applyTheme(localStorage.getItem('cba-theme') || 'dark');
     <button class="nav-tab" id="tab-report" onclick="showPage('report',true)">Report</button>
     <button class="nav-tab" id="tab-settings" onclick="showPage('settings',true)">⚙️</button>
   </div>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
 </nav>
 
 <!-- ═══════════ APPLY ═══════════ -->
