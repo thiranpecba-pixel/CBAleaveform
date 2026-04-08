@@ -1514,7 +1514,7 @@ applyTheme(localStorage.getItem('cba-theme') || 'dark');
 
 <!-- NAV -->
 <nav class="nav">
-  <div class="nav-logo"><div style="line-height:1">CBA</div><div style="font-size:0.72rem;letter-spacing:0.5px;margin-top:1px">Leave<span>Easy</span></div></div>
+  <div class="nav-logo"><div style="line-height:1">CBA</div><div style="font-size:0.72rem;letter-spacing:0.5px;margin-top:1px">Leave</div><div style="font-size:0.72rem;letter-spacing:0.5px;margin-top:1px">Easy</div></div>
   <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
   <div class="nav-tabs">
     <button class="nav-tab active" id="tab-apply" onclick="showPage('apply')">Apply</button>
@@ -1782,5 +1782,11 @@ applyTheme(localStorage.getItem('cba-theme') || 'dark');
 
 <div class="toast" id="toast"></div>
 
+<!-- FOOTER -->
+<footer style="text-align:center;padding:18px 16px 32px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:20px;line-height:1.8;">
+  <div>© <span id="copy-year"></span> CBA Leave Easy. All rights reserved.</div>
+  <div style="margin-top:2px;">Developed by <strong style="color:var(--accent)">Thiran Perera</strong></div>
+</footer>
+<script>document.getElementById('copy-year').textContent = new Date().getFullYear();</script>
 
 </html>
